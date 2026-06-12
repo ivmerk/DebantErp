@@ -1,0 +1,5 @@
+FROM postgres:16-alpine
+COPY DebantErp/Db/*.sql /migrations/
+COPY scripts/migrate.sh /usr/local/bin/migrate.sh
+RUN chmod +x /usr/local/bin/migrate.sh
+ENTRYPOINT ["/usr/local/bin/migrate.sh"]
