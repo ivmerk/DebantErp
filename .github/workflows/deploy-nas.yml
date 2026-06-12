@@ -129,13 +129,16 @@ jobs:
           # 2) migrations (idempotent via _migrations table)
           docker compose -f docker-compose.prod.yml --profile migrate run --rm migrator
 
-          # 3) web
-          docker compose -f docker-compose.prod.yml up -d web
+          # 3) web — force-recreate чтобы compose всегда брал актуальный образ
+          #    (без этого compose может посчитать контейнер up-to-date и не пересоздать)
+          docker compose -f docker-compose.prod.yml up -d --force-recreate web
 
-          # 4) wait for /health
+          # 4) wait for /health и проверяем, что ответ от .NET (содержит "Healthy"),
+          #    а не от какого-то стороннего контейнера на :8080
           for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
-            if wget -qO- http://localhost:8080/health >/dev/null 2>&1; then
-              echo "health OK on attempt \$i"
+            resp=\$(wget -qO- http://localhost:8080/health 2>/dev/null || true)
+            if echo "\$resp" | grep -q "Healthy"; then
+              echo "health OK on attempt \$i: \$resp"
               exit 0
             fi
             sleep 4
