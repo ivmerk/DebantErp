@@ -1,0 +1,15 @@
+**/bin
+**/obj
+**/.vs
+**/.vscode
+**/.idea
+**/wwwroot/dist
+**/.data-protection
+**/node_modules
+.git
+.github
+.dockerignore
+.gitignore
+Doc
+*.md
+docker-compose.dev.yml

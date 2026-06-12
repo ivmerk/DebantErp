@@ -1,0 +1,136 @@
+name: deploy-nas
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Sha or tag to deploy (for rollback)"
+        required: false
+
+concurrency:
+  group: deploy-nas
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        run: echo "tag=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build & push web (smoke)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.smoke
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ vars.GH_REPO }}/web:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ vars.GH_REPO }}/web:master
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-latest
+    environment:
+      name: nas-smoke
+      url: http://ds723plus:8080
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tailscale up (ephemeral)
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      - name: Trust NAS host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.NAS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Install SSH key
+        env:
+          KEY: ${{ secrets.NAS_SSH_KEY }}
+        run: |
+          install -m 600 /dev/stdin ~/.ssh/id_ed25519 <<< "$KEY"
+
+      - name: Copy compose file
+        run: |
+          scp -i ~/.ssh/id_ed25519 \
+            docker-compose.prod.yml \
+            ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }}:${{ secrets.NAS_PATH }}/docker-compose.prod.yml
+
+      - name: Pull, up, health-check
+        id: deploy
+        run: |
+          TAG="${{ github.event.inputs.tag || needs.build-push.outputs.tag }}"
+          ssh -i ~/.ssh/id_ed25519 \
+              ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }} bash -se <<EOF
+          set -euo pipefail
+          cd ${{ secrets.NAS_PATH }}
+
+          # save current TAG for rollback
+          if [ -f .env ]; then
+            grep ^TAG= .env > .env.previous || true
+          fi
+
+          # update TAG in .env (use | as sed separator since sha is hex)
+          sed -i "s|^TAG=.*|TAG=$TAG|" .env
+
+          docker compose -f docker-compose.prod.yml pull
+          docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+          # health
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            if wget -qO- http://localhost:8080/health >/dev/null 2>&1; then
+              echo "health OK on attempt \$i"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "health FAILED"
+          docker compose -f docker-compose.prod.yml logs web | tail -50
+          exit 1
+          EOF
+
+      - name: Rollback on failure
+        if: failure() && steps.deploy.outcome == 'failure'
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+              ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }} bash -se <<'EOF'
+          set -euo pipefail
+          cd "${NAS_PATH}"
+          if [ -f .env.previous ]; then
+            PREV=$(cat .env.previous)
+            echo "Rolling back to $PREV"
+            sed -i "s|^TAG=.*|$PREV|" .env
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+          fi
+          EOF
+        env:
+          NAS_PATH: ${{ secrets.NAS_PATH }}
