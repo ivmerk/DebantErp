@@ -79,8 +79,11 @@ jobs:
           install -m 600 /dev/stdin ~/.ssh/id_ed25519 <<< "$KEY"
 
       - name: Copy compose file
+        # -O: force legacy SCP protocol. SFTP-subsystem on Synology DSM is unreliable
+        # even when "Enable SFTP service" is toggled — keeps falling with
+        # "subsystem request failed on channel 0". Legacy SCP works without SFTP.
         run: |
-          scp -i ~/.ssh/id_ed25519 \
+          scp -O -i ~/.ssh/id_ed25519 \
             docker-compose.prod.yml \
             ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }}:${{ secrets.NAS_PATH }}/docker-compose.prod.yml
 
