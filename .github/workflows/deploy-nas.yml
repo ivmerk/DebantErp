@@ -49,7 +49,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ vars.GH_REPO }}/web:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ vars.GH_REPO }}/web:master
           cache-from: type=gha,scope=web
-          cache-to: type=gha,mode=max,scope=web
+          cache-to: type=gha,mode=min,scope=web
 
       - name: Build & push migrator
         uses: docker/build-push-action@v5
@@ -61,7 +61,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ vars.GH_REPO }}/migrator:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ vars.GH_REPO }}/migrator:master
           cache-from: type=gha,scope=migrator
-          cache-to: type=gha,mode=max,scope=migrator
+          cache-to: type=gha,mode=min,scope=migrator
 
   deploy:
     needs: build-push
