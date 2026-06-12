@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
+builder.Services.AddHealthChecks();
 
 DebantErp.DAL.DbHelper.ConnectionString =
     builder.Configuration.GetConnectionString("DefaultConnection")
@@ -80,7 +81,9 @@ if (!app.Environment.IsDevelopment())
   app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// HTTPS-редирект отключён: в контейнере нет TLS-сертификата, редирект http→https ломает health-check.
+// Включить обратно, когда поставим reverse-proxy с TLS перед приложением.
+// app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -96,6 +99,8 @@ var seeder = new MockDataSeeder(
     encryptService
 );
 await seeder.SeedAsync();
+
+app.MapHealthChecks("/health");
 
 app.MapControllerRoute(
     name: "default",
