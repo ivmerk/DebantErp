@@ -9,10 +9,11 @@ RUN dotnet publish "DebantErp/DebantErp.csproj" \
     /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
+RUN apk add --no-cache wget
 WORKDIR /app
-RUN apk add --no-cache wget && \
-    adduser -D -u 1000 app && \
-    chown -R app /app
+# /app по умолчанию owned by root; чтобы Data Protection мог писать .data-protection/
+# из-под `app` (uid 1654, уже есть в образе) — chown'им /app.
+RUN chown app:app /app
 USER app
 COPY --from=build --chown=app:app /app/publish .
 EXPOSE 8080
