@@ -141,26 +141,29 @@ jobs:
             sleep 4
           done
           echo "health FAILED"
+          echo "=== postgres logs ==="
+          docker compose -f docker-compose.prod.yml logs postgres | tail -50
+          echo "=== web logs ==="
           docker compose -f docker-compose.prod.yml logs web | tail -80
+          echo "=== ps ==="
+          docker compose -f docker-compose.prod.yml ps
           exit 1
           EOF
 
       - name: Rollback on failure
         if: failure() && steps.deploy.outcome == 'failure'
-        env:
-          NAS_PATH: ${{ secrets.NAS_PATH }}
         run: |
           ssh \
               -o StrictHostKeyChecking=accept-new \
               -o UserKnownHostsFile=~/.ssh/known_hosts \
               -i ~/.ssh/id_ed25519 \
-              ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }} bash -se <<'EOF'
+              ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }} bash -se <<EOF
           set -euo pipefail
-          cd "${NAS_PATH}"
+          cd ${{ secrets.NAS_PATH }}
           if [ -f .env.previous ]; then
-            PREV=$(cat .env.previous)
-            echo "Rolling back to $PREV"
-            sed -i "s|^TAG=.*|$PREV|" .env
+            PREV=\$(cat .env.previous)
+            echo "Rolling back to \$PREV"
+            sed -i "s|^TAG=.*|\$PREV|" .env
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d web
           fi
