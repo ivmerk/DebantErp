@@ -37,6 +37,11 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${PG_DB};Username=${PG_USER};Password=${PG_PASSWORD}"
+    volumes:
+      # DataProtection-keys для cookies. Без persistent volume сессии теряются
+      # на каждом рестарте контейнера (cookies становятся нерасшифровываемыми).
+      # Папка на хосте должна быть owned by uid 1654 (юзер `app` в aspnet:10.0-alpine).
+      - ./data/data-protection:/app/.data-protection
     depends_on:
       postgres:
         condition: service_healthy
