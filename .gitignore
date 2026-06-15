@@ -2,3 +2,4 @@ DebantErp/.data-protection
 DebantErp/bin/Debug/net10.0
 DebantErp/obj
 DebantErp/wwwroot/dist/
+.DS_Store
