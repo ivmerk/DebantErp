@@ -17,6 +17,16 @@ services:
       retries: 10
       start_period: 30s
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: debanterp-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@local.dev
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+
   migrator:
     image: ghcr.io/${GH_REPO}/migrator:${TAG}
     profiles: ["migrate"]
