@@ -127,7 +127,10 @@ jobs:
           docker compose -f docker-compose.prod.yml up -d postgres
 
           # 2) migrations (idempotent via _migrations table)
-          docker compose -f docker-compose.prod.yml --profile migrate run --rm migrator
+          # -T + </dev/null: без них `compose run` (он по умолчанию подключает stdin)
+          # съедает остаток heredoc — строки про `up web` и health-check не выполняются,
+          # а job всё равно завершается success. Контейнер web при этом не пересоздаётся.
+          docker compose -f docker-compose.prod.yml --profile migrate run --rm -T migrator </dev/null
 
           # 3) web — force-recreate чтобы compose всегда брал актуальный образ
           #    (без этого compose может посчитать контейнер up-to-date и не пересоздать)
