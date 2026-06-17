@@ -4,6 +4,7 @@ using DebantErp.BL.Employee;
 using DebantErp.MockData;
 using System.IO;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
@@ -29,7 +30,6 @@ builder.Services.AddSingleton<IOrderDAL, OrderDAL>();
 builder.Services.AddSingleton<IOrderLaborCostDAL, OrderLaborCostDAL>();
 
 builder.Services.AddSingleton<IEncrypt, Encrypt>();
-builder.Services.AddSingleton<IAuthSessionDAL, AuthSessionDAL>();
 builder.Services.AddScoped<IAuth, Auth>();
 builder.Services.AddScoped<IEmployee, Employee>();
 builder.Services.AddScoped<IEmployeeDetails, EmployeeDetails>();
@@ -57,19 +57,23 @@ builder.Services.AddSingleton(provider =>
 });
 
 
-// Add session services
 builder.Services.AddCors(options =>
 {
   options.AddPolicy("AllowAll", policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-  options.IdleTimeout = TimeSpan.FromMinutes(30);
-  options.Cookie.HttpOnly = true;
-  options.Cookie.IsEssential = true;
-});
+// Cookie-аутентификация: identity (userid + role) лежит в зашифрованной cookie.
+// Сервер stateless — рестарт/деплой не разлогинивает (ключи Data Protection
+// персистятся в .data-protection/, см. ниже).
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+  .AddCookie(options =>
+  {
+    options.LoginPath = "/login";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.SlidingExpiration = true;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+  });
 
 var app = builder.Build();
 
@@ -88,10 +92,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();
-
 app.UseCors("AllowAll");
 
+app.UseAuthentication();
 app.UseAuthorization();
 var encryptService = app.Services.GetRequiredService<DebantErp.BL.Auth.IEncrypt>();
 var seeder = new MockDataSeeder(

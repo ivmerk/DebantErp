@@ -3,6 +3,9 @@ using DebantErp.DAL.Models;
 using DebantErp.Dtos;
 using DebantErp.Rdos;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace DebantErp.BL.Auth;
 
@@ -11,15 +14,13 @@ public class Auth : IAuth
   private readonly IAuthDAL _authDAL;
   private readonly IEncrypt _encrypt;
   private readonly IHttpContextAccessor _httpContextAccessor;
-  private readonly IAuthSessionDAL _authSessionDAL;
 
 
-  public Auth(IAuthDAL authDAL, IEncrypt encrypt, IHttpContextAccessor httpContextAccessor, IAuthSessionDAL authSessionDAL)
+  public Auth(IAuthDAL authDAL, IEncrypt encrypt, IHttpContextAccessor httpContextAccessor)
   {
     _authDAL = authDAL;
     _encrypt = encrypt;
     _httpContextAccessor = httpContextAccessor;
-    _authSessionDAL = authSessionDAL;
   }
 
   public async Task<int> CreateUser(UserModel user)
@@ -36,45 +37,50 @@ public class Auth : IAuth
     return await _authDAL.Create(user);
   }
 
-  public void Login(int id)
-  {
-    _httpContextAccessor.HttpContext?.Session.SetInt32("userid", id);
-  }
-
   public async Task<int> Authenticate(string email, string password, bool rememberMe)
   {
     var user = await _authDAL.Get(email);
 
     if (user.Id != null && user.Password == _encrypt.HashPassword(password, user.Salt))
     {
-      var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
-      var userAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent.ToString();
-
-      var session = new AuthSessionModel
-      {
-        SessionId = Guid.NewGuid(),
-        UserId = user.Id.Value,
-        SessionToken = Guid.NewGuid().ToString(),
-        IpAddress = ipAddress,
-        UserAgent = userAgent,
-        CreatedAt = DateTime.UtcNow,
-        LastAccessedAt = DateTime.UtcNow,
-        ExpiresAt = rememberMe ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddMinutes(30),
-        IsActive = true,
-      };
-
-      await _authSessionDAL.Create(session);
-      Login(user.Id.Value);
+      await SignInAsync(user, rememberMe);
       return user.Id.Value;
     }
 
     throw new AuthorizationException();
   }
 
-  public async Task Logout(int userId)
+  public async Task Logout()
   {
-    await _authSessionDAL.DeactivateByUserId(userId);
-    _httpContextAccessor.HttpContext?.Session.Remove("userid");
+    var httpContext = _httpContextAccessor.HttpContext;
+    if (httpContext != null)
+      await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+  }
+
+  private async Task SignInAsync(UserModel user, bool isPersistent)
+  {
+    var httpContext = _httpContextAccessor.HttpContext
+      ?? throw new InvalidOperationException("No HttpContext available for sign-in.");
+
+    var claims = new List<Claim>
+    {
+      new(ClaimTypes.NameIdentifier, user.Id!.Value.ToString()),
+      new(ClaimTypes.Name, user.Email ?? ""),
+      new(ClaimTypes.Role, user.Role.ToString()),
+    };
+
+    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+    var principal = new ClaimsPrincipal(identity);
+
+    var props = new AuthenticationProperties
+    {
+      IsPersistent = isPersistent,
+      ExpiresUtc = isPersistent
+        ? DateTimeOffset.UtcNow.AddDays(30)
+        : DateTimeOffset.UtcNow.AddMinutes(30),
+    };
+
+    await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
   }
 
   public async Task<UserRdo> GetUser(int id)

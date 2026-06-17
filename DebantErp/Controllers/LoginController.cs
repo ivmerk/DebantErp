@@ -38,5 +38,13 @@ public class LoginController : Controller
     return View("Index", model);
 
   }
+
+  [HttpPost]
+  [Route("/logout")]
+  public async Task<IActionResult> Logout()
+  {
+    await authBL.Logout();
+    return Redirect("/");
+  }
 }
 

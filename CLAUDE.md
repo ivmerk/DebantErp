@@ -38,10 +38,8 @@ The project is in the middle of a migration from a flat BL/DAL pattern to DDD. B
 
 `DbHelper` is a static wrapper with three methods (`ExecuteAsync`, `ExecuteScalarAsync`, `QueryAsync`) that open a new `NpgsqlConnection` per call. **The connection string is hardcoded in `DbHelper.cs`**, not read from `appsettings.json`.
 
-### DDD layers (reference implementation — `AuthSession` only)
-- `Domain/` — aggregates (`AuthSession`), value objects (`SessionId`, `SessionToken`, `IpAddress`, `UserAgent`), domain events, repository interfaces. No framework dependencies.
-- `Application/Sessions/` — `AuthSessionService` orchestrates domain objects; contains command DTOs.
-- `Infrastructure/Repositories/` — `AuthSessionRepository` implements `IAuthSessionRepository` using Dapper.
+### DDD layers (target pattern — no live reference yet)
+The intended DDD shape is `Domain/` (aggregates, value objects, domain events, repository interfaces — no framework deps) → `Application/` (services orchestrating domain objects + command DTOs) → `Infrastructure/Repositories/` (Dapper repo implementations). These folders do not exist yet; the former `AuthSession` reference implementation was never built out and the session feature now uses plain cookie auth (see Authentication).
 
 When adding new domain features, follow the DDD pattern: domain aggregate → repository interface in `Domain/Repositories/` → service in `Application/` → repository impl in `Infrastructure/` → register in `Program.cs`.
 
@@ -52,9 +50,9 @@ When adding new domain features, follow the DDD pattern: domain aggregate → re
 - `ViewModels/` — Razor view binding models (Login, Register, Profile)
 
 ### Authentication
-Authentication is dual-layered: ASP.NET `ISession` stores `userid` key, and the `AuthSessions` PostgreSQL table stores session records via the DDD `AuthSession` aggregate. Both are written on login and cleared on logout.
+Cookie authentication (`AddAuthentication().AddCookie()`, scheme `Cookies`). On login `Auth.Authenticate` verifies the password and calls `HttpContext.SignInAsync` with a `ClaimsPrincipal` carrying `NameIdentifier` (userid), `Name` (email), and `Role`. `/logout` (POST) calls `SignOutAsync`. The server is stateless — there is no server-side session store and no DB-backed session table. `ICurrentUser.IsLoggedIn()` just checks `User.Identity.IsAuthenticated`.
 
-Data protection keys are persisted to `.data-protection/` so session cookies survive restarts. If cookie decryption fails after a key rotation, clear browser cookies.
+Data protection keys are persisted to `.data-protection/` so the auth cookie survives restarts/redeploys. If cookie decryption fails after a key rotation, clear browser cookies.
 
 New users are created with `Status = NeedToApprove`; admins must activate accounts. Password hashing uses SHA + per-user salt (see `BL/Auth/Encrypt.cs`).
 
@@ -68,5 +66,5 @@ New users are created with `Status = NeedToApprove`; admins must activate accoun
 ## Key files
 - `Program.cs` — DI registration and startup; see here to understand all registered services
 - `DAL/DbHelper.cs` — all DB calls go through this; hardcoded connection string lives here
-- `Domain/Sessions/AuthSession.cs` — canonical example of the target DDD aggregate pattern
+- `BL/Auth/Auth.cs` — login/logout via cookie sign-in; `CurrentUser.cs` — auth-state check
 - `Db/*.sql` — numbered migration scripts; apply in order

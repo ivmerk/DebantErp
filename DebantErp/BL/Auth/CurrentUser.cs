@@ -10,7 +10,6 @@ public class CurrentUser : ICurrentUser
 
         public bool IsLoggedIn()
         {
-          var userId = _httpContextAccessor.HttpContext?.Session.GetInt32("userid");
-          return userId != null;
+          return _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true;
         }
     }
