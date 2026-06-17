@@ -5,6 +5,7 @@ using DebantErp.MockData;
 using System.IO;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
@@ -75,6 +76,16 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.Cookie.IsEssential = true;
   });
 
+// Deny-by-default: каждый endpoint без явной authorization-метаданности требует
+// аутентификации. Публичные точки помечены [AllowAnonymous] (Home/Login/Register),
+// /health — .AllowAnonymous() ниже (иначе деплойный healthcheck словит 302 на /login).
+builder.Services.AddAuthorization(options =>
+{
+  options.FallbackPolicy = new AuthorizationPolicyBuilder()
+    .RequireAuthenticatedUser()
+    .Build();
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -103,7 +114,7 @@ var seeder = new MockDataSeeder(
 );
 await seeder.SeedAsync();
 
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/health").AllowAnonymous();
 
 app.MapControllerRoute(
     name: "default",

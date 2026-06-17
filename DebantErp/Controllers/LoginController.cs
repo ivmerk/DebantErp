@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using DebantErp.BL.Auth;
 using DebantErp.ViewModels;
 
 namespace DebantErp.Controllers;
 
+[AllowAnonymous]
 public class LoginController : Controller
 {
 

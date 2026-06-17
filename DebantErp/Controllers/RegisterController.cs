@@ -1,8 +1,10 @@
 ﻿using DebantErp.BL.Auth;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using DebantErp.ViewModels;
 using DebantErp.ViewMapper;
 namespace DebantErp.Controllers;
+[AllowAnonymous]
 public class RegisterController : Controller
 {
     private readonly IAuth authBL;

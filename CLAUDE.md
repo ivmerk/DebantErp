@@ -56,6 +56,8 @@ Data protection keys are persisted to `.data-protection/` so the auth cookie sur
 
 New users are created with `Status = NeedToApprove`; admins must activate accounts. Password hashing uses SHA + per-user salt (see `BL/Auth/Encrypt.cs`).
 
+**Authorization is deny-by-default**: `Program.cs` sets a `FallbackPolicy` requiring an authenticated user, so every endpoint needs login unless marked `[AllowAnonymous]` (`Home`, `Login`, `Register`, and `/health` via `.AllowAnonymous()`). `UserController` is `[Authorize(Roles = "Admin")]`. The role claim value is the `UserRoleEnum` name (`"Admin"`/`"User"`, capitalized) — role checks are case-sensitive, so match that casing in `[Authorize(Roles = ...)]`.
+
 ### Mock data
 `MockDataSeeder.SeedAsync()` is called unconditionally at application startup (`Program.cs`). It seeds users, employees, specialties, orders, and production rates if the tables are empty.
 

@@ -1,8 +1,10 @@
 using DebantErp.BL.Auth;
 using DebantErp.Dtos;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
+[Authorize(Roles = "Admin")]
 [Route("users")]
 public class UserController : ControllerBase
 {
