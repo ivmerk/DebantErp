@@ -43,6 +43,7 @@ public class LoginController : Controller
 
   [HttpPost]
   [Route("/logout")]
+  [ValidateAntiForgeryToken]
   public async Task<IActionResult> Logout()
   {
     await authBL.Logout();
