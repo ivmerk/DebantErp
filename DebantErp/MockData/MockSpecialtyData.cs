@@ -1,11 +1,11 @@
 using Dapper;
 using Npgsql;
 
-public class MockSpecialityData
+public class MockSpecialtyData
 {
     private readonly string _connectionString;
 
-    public MockSpecialityData(string connectionString)
+    public MockSpecialtyData(string connectionString)
     {
         _connectionString = connectionString;
     }
@@ -17,13 +17,13 @@ public class MockSpecialityData
 
         using var transaction = await connection.BeginTransactionAsync();
 
-        var specialityCount = await connection.ExecuteScalarAsync<int>(
-            "SELECT COUNT(*) FROM specialities"
+        var specialtyCount = await connection.ExecuteScalarAsync<int>(
+            "SELECT COUNT(*) FROM specialties"
         );
-        if (specialityCount > 0)
+        if (specialtyCount > 0)
             return;
 
-        var specialities = new List<object>
+        var specialties = new List<object>
         {
             new { Name = "Швея", IsActual = true },
             new { Name = "Ткач", IsActual = true },
@@ -34,31 +34,31 @@ public class MockSpecialityData
 
         try
         {
-            string insertSpecialitiesSql =
+            string insertSpecialtiesSql =
                 @"
-                INSERT INTO specialities (name, is_actual) 
+                INSERT INTO specialties (name, is_actual) 
                 VALUES (@Name, @IsActual) 
                 ON CONFLICT (name) DO NOTHING 
                 RETURNING id";
-            var specialityIds = new List<int>();
+            var specialtyIds = new List<int>();
 
-            foreach (var speciality in specialities)
+            foreach (var specialty in specialties)
             {
                 var id = await connection.QuerySingleOrDefaultAsync<int>(
-                    insertSpecialitiesSql,
-                    speciality,
+                    insertSpecialtiesSql,
+                    specialty,
                     transaction
                 );
                 if (id != 0) // если вставка произошла
-                    specialityIds.Add(id);
+                    specialtyIds.Add(id);
             }
 
-            if (!specialityIds.Any())
+            if (!specialtyIds.Any())
             {
-                string getExistingSpecialitiesSql = "SELECT id FROM specialities";
-                specialityIds = (
+                string getExistingSpecialtiesSql = "SELECT id FROM specialties";
+                specialtyIds = (
                     await connection.QueryAsync<int>(
-                        getExistingSpecialitiesSql,
+                        getExistingSpecialtiesSql,
                         transaction: transaction
                     )
                 ).ToList();
@@ -75,16 +75,16 @@ public class MockSpecialityData
             }
 
             var random = new Random();
-            var employeeSpecialities = new List<dynamic>();
+            var employeeSpecialties = new List<dynamic>();
 
             foreach (var employeeId in employeeIds)
             {
-                var specialityId = specialityIds[random.Next(specialityIds.Count)];
-                employeeSpecialities.Add(
+                var specialtyId = specialtyIds[random.Next(specialtyIds.Count)];
+                employeeSpecialties.Add(
                     new
                     {
                         EmployeeId = employeeId,
-                        SpecialityId = specialityId,
+                        SpecialtyId = specialtyId,
                         DateFrom = DateTime.UtcNow.Date,
                         IsActual = true,
                         CreatedAt = DateTime.UtcNow,
@@ -93,14 +93,14 @@ public class MockSpecialityData
                 );
             }
 
-            string insertEmployeeSpecialitiesSql =
+            string insertEmployeeSpecialtiesSql =
                 @"
-                INSERT INTO employee_speciality_assignments (employee_id, speciality_id, date_from, is_actual, created_at, updated_at) 
-                VALUES (@EmployeeId, @SpecialityId, @DateFrom, @IsActual, @CreatedAt, @UpdatedAt)";
+                INSERT INTO employee_specialty_assignments (employee_id, specialty_id, date_from, is_actual, created_at, updated_at) 
+                VALUES (@EmployeeId, @SpecialtyId, @DateFrom, @IsActual, @CreatedAt, @UpdatedAt)";
 
             await connection.ExecuteAsync(
-                insertEmployeeSpecialitiesSql,
-                employeeSpecialities,
+                insertEmployeeSpecialtiesSql,
+                employeeSpecialties,
                 transaction
             );
 

@@ -1,12 +1,12 @@
 namespace DebantErp.DAL.Models
 {
-    public class EmployeeSpecialityAssignmentModel
+    public class EmployeeSpecialtyAssignmentModel
     {
         public int Id { get; set; }
 
         public int EmployeeId { get; set; }
 
-        public int SpecialityId { get; set; }
+        public int SpecialtyId { get; set; }
 
         public bool IsActual { get; set; } = true;
 

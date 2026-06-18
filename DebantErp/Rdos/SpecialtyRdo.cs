@@ -1,6 +1,6 @@
 namespace DebantErp.Rdos
 {
-    public class SpecialityRdo
+    public class SpecialtyRdo
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;

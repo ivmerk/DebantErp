@@ -8,9 +8,9 @@ namespace DebantErp.Dtos
         [RegularExpression(@"^\d+$", ErrorMessage = "EmployeeId must be a number")]
         public int EmployeeId { get; set; }
 
-        [Required(ErrorMessage = "SpecialityId is required")]
-        [RegularExpression(@"^\d+$", ErrorMessage = "SpecialityId must be a number")]
-        public int SpecialityId { get; set; }
+        [Required(ErrorMessage = "SpecialtyId is required")]
+        [RegularExpression(@"^\d+$", ErrorMessage = "SpecialtyId must be a number")]
+        public int SpecialtyId { get; set; }
 
         [Required(ErrorMessage = "DateFrom is required")]
         public string DateFrom { get; set; } = null!;

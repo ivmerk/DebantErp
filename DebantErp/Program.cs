@@ -25,8 +25,8 @@ builder.Services.AddDataProtection()
 builder.Services.AddSingleton<IAuthDAL, AuthDAL>();
 builder.Services.AddSingleton<IEmployeeDAL, EmployeeDAL>();
 builder.Services.AddSingleton<IEmployeeDetailsDAL, EmployeeDetailsDAL>();
-builder.Services.AddSingleton<ISpecialityDAL, SpecialityDAL>();
-builder.Services.AddSingleton<IEmployeeSpecialityAssignmentDAL, EmployeeSpecialityAssignmentDAL>();
+builder.Services.AddSingleton<ISpecialtyDAL, SpecialtyDAL>();
+builder.Services.AddSingleton<IEmployeeSpecialtyAssignmentDAL, EmployeeSpecialtyAssignmentDAL>();
 builder.Services.AddSingleton<IOrderDAL, OrderDAL>();
 builder.Services.AddSingleton<IOrderLaborCostDAL, OrderLaborCostDAL>();
 
@@ -34,8 +34,8 @@ builder.Services.AddSingleton<IEncrypt, Encrypt>();
 builder.Services.AddScoped<IAuth, Auth>();
 builder.Services.AddScoped<IEmployee, Employee>();
 builder.Services.AddScoped<IEmployeeDetails, EmployeeDetails>();
-builder.Services.AddScoped<IEmployeeSpecialityAssignment, EmployeeSpecialityAssignment>();
-builder.Services.AddScoped<DebantErp.BL.Speciality.ISpeciality, DebantErp.BL.Speciality.Speciality>();
+builder.Services.AddScoped<IEmployeeSpecialtyAssignment, EmployeeSpecialtyAssignment>();
+builder.Services.AddScoped<DebantErp.BL.Specialty.ISpecialty, DebantErp.BL.Specialty.Specialty>();
 builder.Services.AddScoped<DebantErp.BL.Order.IOrder, DebantErp.BL.Order.Order>();
 builder.Services.AddScoped<DebantErp.BL.Auth.ICurrentUser, DebantErp.BL.Auth.CurrentUser>();
 builder.Services.AddScoped<DebantErp.BL.OrderLaborCost.IOrderLaborCost, DebantErp.BL.OrderLaborCost.OrderLostCost>();

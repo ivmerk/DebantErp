@@ -48,7 +48,7 @@ DebantErp/
 │   │   ├── Auth/                   # Authentication
 │   │   ├── Employee/               # Employee management
 │   │   ├── Order/                  # Order management
-│   │   ├── Speciality/             # Specialties
+│   │   ├── Specialty/              # Specialties
 │   │   └── OrderLaborCost/         # Labor cost calculations
 │   │
 │   ├── DAL/                        # Data Access Layer
@@ -94,7 +94,7 @@ docker-compose -f docker-compose.dev.yml up -d
 # Execute SQL files in order:
 001_create_users.sql
 002_create_employees.sql
-003_create_specialities.sql
+003_create_specialties.sql
 004_create_productuion_rates.sql
 005_create_orders.sql
 006_create_order_labor_costs.sql
@@ -248,7 +248,7 @@ public class Service
 |-------|-------------|
 | `users` | User accounts (auth, roles) |
 | `employees` | Employee records |
-| `specialities` | Job specialties |
+| `specialties` | Job specialties |
 | `production_rates` | Production operation rates |
 | `orders` | Customer orders |
 | `order_labor_costs` | Labor cost tracking |

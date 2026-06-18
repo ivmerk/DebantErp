@@ -1,6 +1,6 @@
 namespace DebantErp.DAL.Models
 {
-    public class SpecialityModel
+    public class SpecialtyModel
     {
         public int Id { get; set; }
 

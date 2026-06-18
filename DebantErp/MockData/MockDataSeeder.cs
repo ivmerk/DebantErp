@@ -17,14 +17,14 @@ namespace DebantErp.MockData
         {
             var userMock = new MockUserData(_connectionString, _encrypt);
             var employeeMock = new MockEmployeeData(_connectionString);
-            var specialityMock = new MockSpecialityData(_connectionString);
+            var specialtyMock = new MockSpecialtyData(_connectionString);
             var orderMock = new MockOrderData(_connectionString);
             var productionOperationMock = new MockProductionOperation(_connectionString);
             var productionRateMock = new MockProductionRate(_connectionString);
 
             await userMock.InsertAsync();
             await employeeMock.InsertAsync();
-            await specialityMock.InsertAsync();
+            await specialtyMock.InsertAsync();
             await orderMock.InsertAsync();
             await productionOperationMock.InsertAsync();
             await productionRateMock.InsertAsync();
