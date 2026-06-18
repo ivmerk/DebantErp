@@ -3,9 +3,13 @@ using DebantErp.DAL.Models;
 namespace DebantErp.DAL;
 public class AuthDAL : IAuthDAL
 {
-  public Task<List<UserModel>> Get()
+  public async Task<List<UserModel>> Get()
   {
-      throw new NotImplementedException();
+      var result = await DbHelper.QueryAsync<UserModel>(
+          "SELECT id, first_name AS FirstName, last_name AS LastName, phone, role, email, status, created_at AS CreatedAt, updated_at AS UpdatedAt FROM users ORDER BY id",
+          new { }
+      );
+      return result.ToList();
   }
 
   public async Task<UserModel> Get(string email)

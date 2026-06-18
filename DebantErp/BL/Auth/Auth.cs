@@ -100,6 +100,23 @@ public class Auth : IAuth
     };
   }
 
+  public async Task<List<UserRdo>> GetUsers()
+  {
+    var users = await _authDAL.Get();
+    return users.Select(user => new UserRdo
+    {
+      Id = user.Id ?? -1,
+      FirstName = user.FirstName ?? "",
+      LastName = user.LastName ?? "",
+      Phone = user.Phone ?? "",
+      Role = user.Role,
+      Email = user.Email ?? "",
+      Status = user.Status,
+      CreatedAt = user.CreatedAt,
+      UpdatedAt = user.UpdatedAt,
+    }).ToList();
+  }
+
   public async Task<int> UpdateUser(int id, UpdateUserDto model)
   {
     var user = await GetUser(id);

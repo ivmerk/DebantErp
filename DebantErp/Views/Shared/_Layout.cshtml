@@ -41,6 +41,13 @@
               <a class="nav-link text-dark @(GetActive("Home", "Privacy"))" asp-area="" asp-controller="Home"
                 asp-action="Privacy">Privacy</a>
             </li>
+            @if (User.IsInRole("Admin"))
+            {
+              <li class="nav-item">
+                <a class="nav-link text-dark @(GetActive("Admin"))" asp-controller="Admin"
+                  asp-action="Users">Администрирование</a>
+              </li>
+            }
             <li class="nav-item">
               <a class="nav-link text-dark @(GetActive("Login", "Index"))" asp-controller="Login"
                 asp-action="Index">Войти</a>

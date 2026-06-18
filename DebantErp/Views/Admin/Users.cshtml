@@ -1,0 +1,48 @@
+@using DebantErp.Rdos
+@using DebantErp.DAL.Models
+@model List<UserRdo>
+
+@{
+    ViewData["Title"] = "Администрирование — пользователи";
+}
+
+<h1 class="mb-4">Пользователи</h1>
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Имя</th>
+            <th>Роль и статус</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <td>@u.Id</td>
+                <td>@u.Email</td>
+                <td>@u.FirstName @u.LastName</td>
+                <td>
+                    <form asp-controller="Admin" asp-action="UpdateUser" asp-route-id="@u.Id" method="post"
+                          class="d-flex gap-2 align-items-center">
+                        <select name="role" class="form-select form-select-sm" style="width:auto">
+                            @foreach (var r in Enum.GetValues<UserRoleEnum>())
+                            {
+                                <option value="@((int)r)" selected="@(u.Role == r)">@r</option>
+                            }
+                        </select>
+                        <select name="status" class="form-select form-select-sm" style="width:auto">
+                            @foreach (var s in Enum.GetValues<UserStatusEnum>())
+                            {
+                                <option value="@((int)s)" selected="@(u.Status == s)">@s</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

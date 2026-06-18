@@ -11,6 +11,7 @@ public interface IAuth
   Task<int> Authenticate(string email, string password, bool rememberMe);
   Task Logout();
   Task<UserRdo> GetUser(int id);
+  Task<List<UserRdo>> GetUsers();
   Task<int> UpdateUser(int id, UpdateUserDto dto);
   Task<ValidationResult?> ValidateEmail(string email);
 
