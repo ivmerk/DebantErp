@@ -5,6 +5,7 @@
 **/.idea
 **/wwwroot/dist
 **/.data-protection
+**/.logs
 **/node_modules
 .git
 .github

@@ -52,6 +52,9 @@ services:
       # на каждом рестарте контейнера (cookies становятся нерасшифровываемыми).
       # Папка на хосте должна быть owned by uid 1654 (юзер `app` в aspnet:10.0-alpine).
       - ./data/data-protection:/app/.data-protection
+      # Логи Serilog (rolling file). Переживают пересоздание контейнера.
+      # Папка на хосте тоже должна быть owned by uid 1654.
+      - ./data/logs:/app/.logs
     depends_on:
       postgres:
         condition: service_healthy
