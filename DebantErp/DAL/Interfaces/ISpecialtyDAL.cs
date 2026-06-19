@@ -2,8 +2,9 @@ using DebantErp.DAL.Models;
 
 namespace DebantErp.DAL
 {
-    public interface ISpecialtyDAL : IBaseDAL<SpecialtyModel>
-    {
-        public Task<bool> IsExist(string name);
-    }
+  public interface ISpecialtyDAL : IBaseDAL<SpecialtyModel>
+  {
+    public Task<bool> IsExist(string name);
+    public Task<SpecialtyModel> GetByName(string name);
+  }
 }
