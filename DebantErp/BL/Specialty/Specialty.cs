@@ -40,8 +40,18 @@ namespace DebantErp.BL.Specialty
       return specialtyRdo;
     }
 
+    // Нормализация: первая буква заглавная, остальные строчные, без крайних пробелов.
+    // "ШВЕЯ" / "швея" / " шВеЯ " -> "Швея".
+    private static string Capitalize(string name)
+    {
+      name = (name ?? "").Trim();
+      if (name.Length == 0) return name;
+      return char.ToUpperInvariant(name[0]) + name[1..].ToLowerInvariant();
+    }
+
     public async Task<int> Create(CreateUpdateSpecialtyDto dto)
     {
+      dto.Name = Capitalize(dto.Name);
       var isExist = await _specialtyDAL.IsExist(dto.Name);
       if (isExist)
       {
@@ -64,6 +74,7 @@ namespace DebantErp.BL.Specialty
 
     public async Task<int> Update(int id, CreateUpdateSpecialtyDto dto)
     {
+      dto.Name = Capitalize(dto.Name);
       var specialty = await _specialtyDAL.Get(id);
       // Проверяем дубликат только если имя реально меняется — иначе IsExist
       // находит саму редактируемую запись и ложно кидает "already exist".
