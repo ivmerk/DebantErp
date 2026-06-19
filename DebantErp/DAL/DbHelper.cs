@@ -9,6 +9,15 @@ namespace DebantErp.DAL
 
         private static ILogger? _logger;
 
+        static DbHelper()
+        {
+            // БД использует snake_case (is_actual, created_at, first_name...),
+            // а модели — PascalCase. Без этого Dapper не маппит такие колонки
+            // на SELECT * и свойства остаются дефолтными (напр. IsActual=true
+            // у мягко удалённых записей).
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+        }
+
         public static void SetLogger(ILogger logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
