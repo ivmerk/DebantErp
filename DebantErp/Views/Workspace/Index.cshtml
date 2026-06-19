@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Данные";
+}
+
+<h1 class="mb-4">С какой сущностью работаем?</h1>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+    @{
+        var tiles = new[]
+        {
+            ("Работники", "Сотрудники и их данные", "Employees"),
+            ("Специальности", "Справочник специальностей", "Specialties"),
+            ("Расценки", "Производственные расценки", "Rates"),
+            ("Заказы", "Заказы и трудозатраты", "Orders"),
+        };
+    }
+    @foreach (var (title, desc, action) in tiles)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">@title</h5>
+                    <p class="card-text text-muted flex-grow-1">@desc</p>
+                    <a class="btn btn-primary mt-2" asp-controller="Workspace" asp-action="@action">Открыть</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
