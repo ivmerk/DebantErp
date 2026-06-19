@@ -1,5 +1,6 @@
 using DebantErp.BL.Specialty;
 using DebantErp.Dtos;
+using DebantErp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DebantErp.Controllers;
@@ -8,6 +9,8 @@ namespace DebantErp.Controllers;
 [Route("workspace")]
 public class WorkspaceController : Controller
 {
+    private const int PageSize = 20;
+
     private readonly ISpecialty _specialty;
 
     public WorkspaceController(ISpecialty specialty)
@@ -30,11 +33,18 @@ public class WorkspaceController : Controller
 
     // --- Специальности ---
     [HttpGet("specialties")]
-    public async Task<IActionResult> Specialties()
+    public async Task<IActionResult> Specialties(int page = 1)
     {
-        var all = await _specialty.GetSpecialties();
-        // мягко удалённые (is_actual = false) в списке не показываем
-        return View(all.Where(s => s.IsActual).ToList());
+        var all = (await _specialty.GetSpecialties())
+            .Where(s => s.IsActual)            // мягко удалённые не показываем
+            .OrderBy(s => s.Name)              // сортировка по названию
+            .ToList();
+
+        var totalPages = Math.Max(1, (int)Math.Ceiling(all.Count / (double)PageSize));
+        page = Math.Clamp(page, 1, totalPages);
+
+        var items = all.Skip((page - 1) * PageSize).Take(PageSize).ToList();
+        return View(new SpecialtyListViewModel { Items = items, Page = page, TotalPages = totalPages });
     }
 
     [HttpPost("specialties/create")]
@@ -60,12 +70,12 @@ public class WorkspaceController : Controller
 
     [HttpPost("specialties/{id:int}/edit")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SpecialtyEdit(int id, CreateUpdateSpecialtyDto dto)
+    public async Task<IActionResult> SpecialtyEdit(int id, CreateUpdateSpecialtyDto dto, int page = 1)
     {
         if (!ModelState.IsValid)
         {
             TempData["Error"] = "Название не может быть пустым.";
-            return RedirectToAction(nameof(Specialties));
+            return RedirectToAction(nameof(Specialties), new { page });
         }
         try
         {
@@ -76,15 +86,15 @@ public class WorkspaceController : Controller
         {
             TempData["Error"] = $"Специальность «{dto.Name}» уже существует.";
         }
-        return RedirectToAction(nameof(Specialties));
+        return RedirectToAction(nameof(Specialties), new { page });
     }
 
     [HttpPost("specialties/{id:int}/delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SpecialtyDelete(int id)
+    public async Task<IActionResult> SpecialtyDelete(int id, int page = 1)
     {
         await _specialty.Delete(id);
         TempData["Success"] = "Специальность удалена.";
-        return RedirectToAction(nameof(Specialties));
+        return RedirectToAction(nameof(Specialties), new { page });
     }
 }
