@@ -54,12 +54,14 @@ namespace DebantErp.BL.Specialty
 
         public async Task<int> Update(int id, CreateUpdateSpecialtyDto dto)
         {
-            var isExist = await _specialtyDAL.IsExist(dto.Name);
-            if (isExist)
+            var specialty = await _specialtyDAL.Get(id);
+            // Проверяем дубликат только если имя реально меняется — иначе IsExist
+            // находит саму редактируемую запись и ложно кидает "already exist".
+            if (!string.Equals(specialty.Name, dto.Name, StringComparison.OrdinalIgnoreCase)
+                && await _specialtyDAL.IsExist(dto.Name))
             {
                 throw new Exception("Specialty already exist");
             }
-            var specialty = await _specialtyDAL.Get(id);
             specialty.Name = dto.Name;
             return await _specialtyDAL.Update(specialty);
         }
