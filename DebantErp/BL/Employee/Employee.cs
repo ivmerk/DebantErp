@@ -9,18 +9,19 @@ namespace DebantErp.BL.Employee
     {
         private readonly IEmployeeDAL _employeeDAL;
         private readonly IEmployeeDetailsDAL _employeeDetailsDAL;
+        private readonly IEmployeeDetails _employeeDetails;
 
-        public Employee(IEmployeeDAL employeeDAL, IEmployeeDetailsDAL employeeDetailsDAL)
+        public Employee(IEmployeeDAL employeeDAL, IEmployeeDetailsDAL employeeDetailsDAL, IEmployeeDetails employeeDetails)
         {
             _employeeDAL = employeeDAL;
             _employeeDetailsDAL = employeeDetailsDAL;
+            _employeeDetails = employeeDetails;
         }
 
         public async Task<List<EmployeeRdo>> Get()
         {
             var employees = await _employeeDAL.Get();
 
-            if (employees == null || employees.Count == 0) throw new Exception("Employees not found");
             var employeeRdos = employees
                 .Select(e => new EmployeeRdo
                 {
@@ -82,7 +83,7 @@ namespace DebantErp.BL.Employee
         public async Task<int> Update(int id, UpdateEmployeeDto dto)
         {
             var emplotyee = await _employeeDAL.Get(id);
-            if (emplotyee == null)
+            if (emplotyee == null || emplotyee.Id == 0)
             {
                 return 0;
             }
@@ -92,7 +93,12 @@ namespace DebantErp.BL.Employee
                 emplotyee.MiddleName = dto.MiddleName;
             if (!string.IsNullOrWhiteSpace(dto.LastName))
                 emplotyee.LastName = dto.LastName;
-            return await _employeeDAL.Update(emplotyee);
+            var result = await _employeeDAL.Update(emplotyee);
+
+            // Заодно обновляем детали (ИНН, адрес, почта, телефон, дата рождения, пол).
+            await _employeeDetails.UpdateEmployeeDetails(id, dto);
+
+            return result;
         }
 
         public async Task<int> Delete(int id)

@@ -8,20 +8,20 @@
     @{
         var tiles = new[]
         {
-            ("Работники", "Сотрудники и их данные", "Employees"),
-            ("Специальности", "Справочник специальностей", "Specialties"),
-            ("Расценки", "Производственные расценки", "Rates"),
-            ("Заказы", "Заказы и трудозатраты", "Orders"),
+            ("Работники", "Сотрудники и их данные", "Employees", "Index"),
+            ("Специальности", "Справочник специальностей", "Specialties", "Index"),
+            ("Расценки", "Производственные расценки", "Workspace", "Rates"),
+            ("Заказы", "Заказы и трудозатраты", "Workspace", "Orders"),
         };
     }
-    @foreach (var (title, desc, action) in tiles)
+    @foreach (var (title, desc, controller, action) in tiles)
     {
         <div class="col">
             <div class="card h-100 shadow-sm">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">@title</h5>
                     <p class="card-text text-muted flex-grow-1">@desc</p>
-                    <a class="btn btn-primary mt-2" asp-controller="Workspace" asp-action="@action">Открыть</a>
+                    <a class="btn btn-primary mt-2" asp-controller="@controller" asp-action="@action">Открыть</a>
                 </div>
             </div>
         </div>
