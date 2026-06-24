@@ -51,6 +51,7 @@ public class EmployeesController : WorkspaceBaseController
                 .Select(a => new EmployeeAssignmentView
                 {
                     Id = a.Id,
+                    SpecialtyId = a.SpecialtyId,
                     SpecialtyName = specialtyNames.TryGetValue(a.SpecialtyId, out var name) ? name : $"#{a.SpecialtyId}",
                     DateFrom = a.DateFrom,
                 })
@@ -117,11 +118,22 @@ public class EmployeesController : WorkspaceBaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AssignSpecialty(int id, int specialtyId, string? dateFrom, int page = 1)
     {
-        if (specialtyId <= 0 || string.IsNullOrWhiteSpace(dateFrom))
+        if (specialtyId <= 0 || string.IsNullOrWhiteSpace(dateFrom)
+            || !DateTime.TryParse(dateFrom, out var newDate))
         {
             TempData["Error"] = "Выберите специальность и дату начала.";
             return RedirectToAction(nameof(Index), new { page, edit = true });
         }
+
+        // Нельзя сдвигать дату начала уже назначенной специальности назад.
+        var current = (await _assignment.GetByEmployee(id))
+            .FirstOrDefault(a => a.SpecialtyId == specialtyId);
+        if (current != null && newDate.Date < current.DateFrom.Date)
+        {
+            TempData["Error"] = $"Дата начала не может быть раньше текущей ({current.DateFrom:yyyy-MM-dd}).";
+            return RedirectToAction(nameof(Index), new { page, edit = true });
+        }
+
         try
         {
             await _assignment.Create(new CreateEmployeeAssignmentDto
