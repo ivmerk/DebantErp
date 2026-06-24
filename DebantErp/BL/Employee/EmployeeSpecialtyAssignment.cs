@@ -16,15 +16,28 @@ namespace DebantErp.BL.Employee
             _employeeSpecialtyAssignmentDAL = employeeSpecialtyAssignmentDAL;
         }
 
-        public Task<int> Create(CreateEmployeeAssignmentDto dto)
+        public async Task<int> Create(CreateEmployeeAssignmentDto dto)
         {
+            var dateFrom = DateTime.Parse(dto.DateFrom);
+
+            // unique(employee_id, specialty_id): если связь уже была (в т.ч. мягко
+            // снятая) — реактивируем её, а не создаём дубликат.
+            var existing = await _employeeSpecialtyAssignmentDAL
+                .GetByEmployeeAndSpecialty(dto.EmployeeId, dto.SpecialtyId);
+            if (existing != null && existing.Id != 0)
+            {
+                existing.IsActual = true;
+                existing.DateFrom = dateFrom;
+                return await _employeeSpecialtyAssignmentDAL.Update(existing);
+            }
+
             var model = new EmployeeSpecialtyAssignmentModel
             {
                 EmployeeId = dto.EmployeeId,
                 SpecialtyId = dto.SpecialtyId,
-                DateFrom = DateTime.Parse(dto.DateFrom),
+                DateFrom = dateFrom,
             };
-            return _employeeSpecialtyAssignmentDAL.Create(model);
+            return await _employeeSpecialtyAssignmentDAL.Create(model);
         }
 
 

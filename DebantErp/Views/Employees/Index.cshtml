@@ -173,6 +173,60 @@ else
                                 </div>
                             </div>
                         </form>
+
+                        @* Специальности работника — показ + (в режиме правки) назначение/снятие.
+                           Формы вынесены ОТДЕЛЬНО от формы редактирования: вложенные <form> недопустимы. *@
+                        <div class="mt-2">
+                            <span class="text-muted small me-2">Специальности:</span>
+                            @if (row.Assignments.Count == 0)
+                            {
+                                <span class="text-muted small fst-italic">не назначены</span>
+                            }
+                            @foreach (var a in row.Assignments)
+                            {
+                                @if (Model.Edit)
+                                {
+                                    <form asp-controller="Employees" asp-action="RemoveSpecialty" asp-route-id="@e.Id"
+                                          asp-route-assignmentId="@a.Id" asp-route-page="@Model.Page" method="post"
+                                          class="d-inline-block me-1 mb-1"
+                                          onsubmit="return confirm('Снять специальность «@a.SpecialtyName»?');">
+                                        <span class="badge text-bg-secondary">
+                                            @a.SpecialtyName <span class="opacity-75">с @a.DateFrom.ToString("yyyy-MM-dd")</span>
+                                            <button type="submit" class="btn-close btn-close-white ms-1 align-middle"
+                                                    style="font-size:.6rem" aria-label="Снять"></button>
+                                        </span>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-light border me-1 mb-1">
+                                        @a.SpecialtyName <span class="text-muted">с @a.DateFrom.ToString("yyyy-MM-dd")</span>
+                                    </span>
+                                }
+                            }
+
+                            @if (Model.Edit)
+                            {
+                                <form asp-controller="Employees" asp-action="AssignSpecialty" asp-route-id="@e.Id"
+                                      asp-route-page="@Model.Page" method="post" class="row g-2 mt-1">
+                                    <div class="col-auto">
+                                        <select name="specialtyId" class="form-select form-select-sm" required>
+                                            <option value="" disabled selected>Специальность…</option>
+                                            @foreach (var sp in Model.Specialties)
+                                            {
+                                                <option value="@sp.Id">@sp.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input name="dateFrom" type="date" class="form-control form-control-sm" required />
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Назначить</button>
+                                    </div>
+                                </form>
+                            }
+                        </div>
                     </td>
                     <td>
                         @if (Model.Edit)

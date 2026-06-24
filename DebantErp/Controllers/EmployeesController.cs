@@ -1,4 +1,5 @@
 using DebantErp.BL.Employee;
+using DebantErp.BL.Specialty;
 using DebantErp.Dtos;
 using DebantErp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -11,11 +12,19 @@ public class EmployeesController : WorkspaceBaseController
 {
     private readonly IEmployee _employee;
     private readonly IEmployeeDetails _employeeDetails;
+    private readonly IEmployeeSpecialtyAssignment _assignment;
+    private readonly ISpecialty _specialty;
 
-    public EmployeesController(IEmployee employee, IEmployeeDetails employeeDetails)
+    public EmployeesController(
+        IEmployee employee,
+        IEmployeeDetails employeeDetails,
+        IEmployeeSpecialtyAssignment assignment,
+        ISpecialty specialty)
     {
         _employee = employee;
         _employeeDetails = employeeDetails;
+        _assignment = assignment;
+        _specialty = specialty;
     }
 
     [HttpGet("")]
@@ -31,14 +40,33 @@ public class EmployeesController : WorkspaceBaseController
 
         var pageItems = all.Skip((page - 1) * PageSize).Take(PageSize).ToList();
 
+        var specialties = await _specialty.GetSpecialties();
+        var specialtyNames = specialties.ToDictionary(s => s.Id, s => s.Name);
+
         var rows = new List<EmployeeRow>();
         foreach (var e in pageItems)
         {
             var details = await _employeeDetails.GetEmployeeDetailsByEmployeeId(e.Id);
-            rows.Add(new EmployeeRow { Employee = e, Details = details });
+            var assignments = (await _assignment.GetByEmployee(e.Id))
+                .Select(a => new EmployeeAssignmentView
+                {
+                    Id = a.Id,
+                    SpecialtyName = specialtyNames.TryGetValue(a.SpecialtyId, out var name) ? name : $"#{a.SpecialtyId}",
+                    DateFrom = a.DateFrom,
+                })
+                .OrderBy(a => a.SpecialtyName)
+                .ToList();
+            rows.Add(new EmployeeRow { Employee = e, Details = details, Assignments = assignments });
         }
 
-        return View(new EmployeeListViewModel { Items = rows, Page = page, TotalPages = totalPages, Edit = edit });
+        return View(new EmployeeListViewModel
+        {
+            Items = rows,
+            Page = page,
+            TotalPages = totalPages,
+            Edit = edit,
+            Specialties = specialties.Where(s => s.IsActual).OrderBy(s => s.Name).ToList(),
+        });
     }
 
     [HttpPost("create")]
@@ -82,6 +110,41 @@ public class EmployeesController : WorkspaceBaseController
     {
         await _employee.Delete(id);
         TempData["Success"] = "Работник удалён.";
+        return RedirectToAction(nameof(Index), new { page, edit = true });
+    }
+
+    [HttpPost("{id:int}/specialties")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AssignSpecialty(int id, int specialtyId, string? dateFrom, int page = 1)
+    {
+        if (specialtyId <= 0 || string.IsNullOrWhiteSpace(dateFrom))
+        {
+            TempData["Error"] = "Выберите специальность и дату начала.";
+            return RedirectToAction(nameof(Index), new { page, edit = true });
+        }
+        try
+        {
+            await _assignment.Create(new CreateEmployeeAssignmentDto
+            {
+                EmployeeId = id,
+                SpecialtyId = specialtyId,
+                DateFrom = dateFrom,
+            });
+            TempData["Success"] = "Специальность назначена.";
+        }
+        catch (Exception)
+        {
+            TempData["Error"] = "Не удалось назначить специальность.";
+        }
+        return RedirectToAction(nameof(Index), new { page, edit = true });
+    }
+
+    [HttpPost("{id:int}/specialties/{assignmentId:int}/delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveSpecialty(int id, int assignmentId, int page = 1)
+    {
+        await _assignment.Delete(assignmentId);
+        TempData["Success"] = "Специальность снята.";
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 }
