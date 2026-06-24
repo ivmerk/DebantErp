@@ -106,6 +106,8 @@ else
         var d = row.Details;
         DateTime.TryParse(d.BirthDate, out var birthDate);
         var isMale = string.Equals(d.Gender, "Male", StringComparison.OrdinalIgnoreCase);
+        // минимально допустимая дата назначения — дата последней уже назначенной специальности
+        var minFrom = row.Assignments.Count > 0 ? row.Assignments.Max(a => a.DateFrom).ToString("yyyy-MM-dd") : null;
         <tr>
           <td colspan="3">
             <form asp-controller="Employees" asp-action="Edit" asp-route-id="@e.Id" asp-route-page="@Model.Page"
@@ -208,17 +210,16 @@ else
                 <form asp-controller="Employees" asp-action="AssignSpecialty" asp-route-id="@e.Id"
                       asp-route-page="@Model.Page" method="post" class="row g-2 mt-1">
                   <div class="col-auto">
-                    <select name="specialtyId" class="form-select form-select-sm assign-specialty" required>
+                    <select name="specialtyId" class="form-select form-select-sm" required>
                       <option value="" disabled selected>Специальность…</option>
                       @foreach (var sp in Model.Specialties)
                       {
-                        var assigned = row.Assignments.FirstOrDefault(x => x.SpecialtyId == sp.Id);
-                        <option value="@sp.Id" data-from="@(assigned?.DateFrom.ToString("yyyy-MM-dd"))">@sp.Name</option>
+                        <option value="@sp.Id">@sp.Name</option>
                       }
                     </select>
                   </div>
                   <div class="col-auto">
-                    <input name="dateFrom" type="date" class="form-control form-control-sm assign-date" required />
+                    <input name="dateFrom" type="date" min="@minFrom" class="form-control form-control-sm" required />
                   </div>
                   <div class="col-auto">
                     <button type="submit" class="btn btn-sm btn-outline-primary">Назначить</button>
@@ -261,22 +262,3 @@ else
     </nav>
   }
 }
-
-@* Для уже назначенной специальности нельзя выбрать дату начала раньше текущей:
-   при выборе специальности подставляем её дату как минимум для поля даты. *@
-<script>
-    document.querySelectorAll('.assign-specialty').forEach(function (sel) {
-        sel.addEventListener('change', function () {
-            var opt = this.options[this.selectedIndex];
-            var from = opt ? opt.getAttribute('data-from') : null;
-            var dateInput = this.closest('form').querySelector('.assign-date');
-            if (!dateInput) return;
-            if (from) {
-                dateInput.min = from;
-                if (dateInput.value && dateInput.value < from) dateInput.value = from;
-            } else {
-                dateInput.removeAttribute('min');
-            }
-        });
-    });
-</script>

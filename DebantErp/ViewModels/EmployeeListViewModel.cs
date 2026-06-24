@@ -21,7 +21,6 @@ namespace DebantErp.ViewModels
     public class EmployeeAssignmentView
     {
         public int Id { get; set; }                 // id назначения (для снятия)
-        public int SpecialtyId { get; set; }        // для сопоставления с выпадающим списком
         public string SpecialtyName { get; set; } = "";
         public DateTime DateFrom { get; set; }
     }

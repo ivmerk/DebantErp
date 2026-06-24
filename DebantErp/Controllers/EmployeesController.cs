@@ -51,7 +51,6 @@ public class EmployeesController : WorkspaceBaseController
                 .Select(a => new EmployeeAssignmentView
                 {
                     Id = a.Id,
-                    SpecialtyId = a.SpecialtyId,
                     SpecialtyName = specialtyNames.TryGetValue(a.SpecialtyId, out var name) ? name : $"#{a.SpecialtyId}",
                     DateFrom = a.DateFrom,
                 })
@@ -125,13 +124,17 @@ public class EmployeesController : WorkspaceBaseController
             return RedirectToAction(nameof(Index), new { page, edit = true });
         }
 
-        // Нельзя сдвигать дату начала уже назначенной специальности назад.
-        var current = (await _assignment.GetByEmployee(id))
-            .FirstOrDefault(a => a.SpecialtyId == specialtyId);
-        if (current != null && newDate.Date < current.DateFrom.Date)
+        // Новая специальность не может начинаться раньше последней уже назначенной
+        // (даты назначений у работника не должны идти назад).
+        var current = await _assignment.GetByEmployee(id);
+        if (current.Count > 0)
         {
-            TempData["Error"] = $"Дата начала не может быть раньше текущей ({current.DateFrom:yyyy-MM-dd}).";
-            return RedirectToAction(nameof(Index), new { page, edit = true });
+            var latest = current.Max(a => a.DateFrom);
+            if (newDate.Date < latest.Date)
+            {
+                TempData["Error"] = $"Дата начала не может быть раньше последней назначенной специальности ({latest:yyyy-MM-dd}).";
+                return RedirectToAction(nameof(Index), new { page, edit = true });
+            }
         }
 
         try
