@@ -12,7 +12,17 @@
     </ol>
 </nav>
 
-<h1 class="mb-3">Специальности</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Специальности</h1>
+    @if (Model.Edit)
+    {
+        <a class="btn btn-outline-secondary" asp-action="Index" asp-route-page="@Model.Page">Готово</a>
+    }
+    else
+    {
+        <a class="btn btn-primary" asp-action="Index" asp-route-page="@Model.Page" asp-route-edit="true">Изменить</a>
+    }
+</div>
 
 @if (TempData["Success"] != null)
 {
@@ -29,14 +39,17 @@
     </div>
 }
 
-<form asp-controller="Specialties" asp-action="Create" method="post" class="row g-2 mb-4">
-    <div class="col-auto">
-        <input name="Name" class="form-control" placeholder="Новая специальность" required maxlength="50" />
-    </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Добавить</button>
-    </div>
-</form>
+@if (Model.Edit)
+{
+    <form asp-controller="Specialties" asp-action="Create" method="post" class="row g-2 mb-4">
+        <div class="col-auto">
+            <input name="Name" class="form-control" placeholder="Новая специальность" required maxlength="50" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </div>
+    </form>
+}
 
 @if (Model.Items.Count == 0)
 {
@@ -48,28 +61,38 @@ else
         <thead>
             <tr>
                 <th>Название</th>
-                <th style="width:200px"></th>
+                @if (Model.Edit)
+                {
+                    <th style="width:200px"></th>
+                }
             </tr>
         </thead>
         <tbody>
             @foreach (var s in Model.Items)
             {
                 <tr>
-                    <td>
-                        <form asp-controller="Specialties" asp-action="Edit" asp-route-id="@s.Id"
-                              asp-route-page="@Model.Page" method="post" class="d-flex gap-2">
-                            <input name="Name" value="@s.Name" class="form-control form-control-sm"
-                                   required maxlength="50" />
-                            <button type="submit" class="btn btn-sm btn-outline-primary">Сохранить</button>
-                        </form>
-                    </td>
-                    <td>
-                        <form asp-controller="Specialties" asp-action="Delete" asp-route-id="@s.Id"
-                              asp-route-page="@Model.Page" method="post"
-                              onsubmit="return confirm('Удалить специальность «@s.Name»?');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
-                        </form>
-                    </td>
+                    @if (Model.Edit)
+                    {
+                        <td>
+                            <form asp-controller="Specialties" asp-action="Edit" asp-route-id="@s.Id"
+                                  asp-route-page="@Model.Page" method="post" class="d-flex gap-2">
+                                <input name="Name" value="@s.Name" class="form-control form-control-sm"
+                                       required maxlength="50" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Сохранить</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form asp-controller="Specialties" asp-action="Delete" asp-route-id="@s.Id"
+                                  asp-route-page="@Model.Page" method="post"
+                                  onsubmit="return confirm('Удалить специальность «@s.Name»?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                            </form>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>@s.Name</td>
+                    }
                 </tr>
             }
         </tbody>
@@ -80,16 +103,16 @@ else
         <nav aria-label="Пагинация">
             <ul class="pagination">
                 <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page - 1)">Назад</a>
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-edit="@Model.Edit">Назад</a>
                 </li>
                 @for (var p = 1; p <= Model.TotalPages; p++)
                 {
                     <li class="page-item @(p == Model.Page ? "active" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="@p">@p</a>
+                        <a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-edit="@Model.Edit">@p</a>
                     </li>
                 }
                 <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)">Вперёд</a>
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-edit="@Model.Edit">Вперёд</a>
                 </li>
             </ul>
         </nav>

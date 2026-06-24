@@ -17,7 +17,7 @@ public class SpecialtiesController : WorkspaceBaseController
     }
 
     [HttpGet("")]
-    public async Task<IActionResult> Index(int page = 1)
+    public async Task<IActionResult> Index(int page = 1, bool edit = false)
     {
         var all = (await _specialty.GetSpecialties())
             .Where(s => s.IsActual)            // мягко удалённые не показываем
@@ -28,7 +28,7 @@ public class SpecialtiesController : WorkspaceBaseController
         page = Math.Clamp(page, 1, totalPages);
 
         var items = all.Skip((page - 1) * PageSize).Take(PageSize).ToList();
-        return View(new SpecialtyListViewModel { Items = items, Page = page, TotalPages = totalPages });
+        return View(new SpecialtyListViewModel { Items = items, Page = page, TotalPages = totalPages, Edit = edit });
     }
 
     [HttpPost("create")]
@@ -38,7 +38,7 @@ public class SpecialtiesController : WorkspaceBaseController
         if (!ModelState.IsValid)
         {
             TempData["Error"] = "Название не может быть пустым.";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { edit = true });
         }
         try
         {
@@ -49,7 +49,7 @@ public class SpecialtiesController : WorkspaceBaseController
         {
             TempData["Error"] = $"Специальность «{dto.Name}» уже существует.";
         }
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Index), new { edit = true });
     }
 
     [HttpPost("{id:int}/edit")]
@@ -59,7 +59,7 @@ public class SpecialtiesController : WorkspaceBaseController
         if (!ModelState.IsValid)
         {
             TempData["Error"] = "Название не может быть пустым.";
-            return RedirectToAction(nameof(Index), new { page });
+            return RedirectToAction(nameof(Index), new { page, edit = true });
         }
         try
         {
@@ -70,7 +70,7 @@ public class SpecialtiesController : WorkspaceBaseController
         {
             TempData["Error"] = $"Специальность «{dto.Name}» уже существует.";
         }
-        return RedirectToAction(nameof(Index), new { page });
+        return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 
     [HttpPost("{id:int}/delete")]
@@ -79,6 +79,6 @@ public class SpecialtiesController : WorkspaceBaseController
     {
         await _specialty.Delete(id);
         TempData["Success"] = "Специальность удалена.";
-        return RedirectToAction(nameof(Index), new { page });
+        return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 }

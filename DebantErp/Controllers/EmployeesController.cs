@@ -19,7 +19,7 @@ public class EmployeesController : WorkspaceBaseController
     }
 
     [HttpGet("")]
-    public async Task<IActionResult> Index(int page = 1)
+    public async Task<IActionResult> Index(int page = 1, bool edit = false)
     {
         var all = (await _employee.Get())
             .Where(e => bool.TryParse(e.IsActual, out var actual) && actual) // мягко удалённых не показываем
@@ -38,7 +38,7 @@ public class EmployeesController : WorkspaceBaseController
             rows.Add(new EmployeeRow { Employee = e, Details = details });
         }
 
-        return View(new EmployeeListViewModel { Items = rows, Page = page, TotalPages = totalPages });
+        return View(new EmployeeListViewModel { Items = rows, Page = page, TotalPages = totalPages, Edit = edit });
     }
 
     [HttpPost("create")]
@@ -48,7 +48,7 @@ public class EmployeesController : WorkspaceBaseController
         if (!ModelState.IsValid)
         {
             TempData["Error"] = "Проверьте корректность заполнения полей.";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { edit = true });
         }
         try
         {
@@ -59,7 +59,7 @@ public class EmployeesController : WorkspaceBaseController
         {
             TempData["Error"] = "Не удалось добавить работника.";
         }
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Index), new { edit = true });
     }
 
     [HttpPost("{id:int}/edit")]
@@ -69,11 +69,11 @@ public class EmployeesController : WorkspaceBaseController
         if (!ModelState.IsValid)
         {
             TempData["Error"] = "Проверьте корректность заполнения полей.";
-            return RedirectToAction(nameof(Index), new { page });
+            return RedirectToAction(nameof(Index), new { page, edit = true });
         }
         await _employee.Update(id, dto);
         TempData["Success"] = "Данные работника обновлены.";
-        return RedirectToAction(nameof(Index), new { page });
+        return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 
     [HttpPost("{id:int}/delete")]
@@ -82,6 +82,6 @@ public class EmployeesController : WorkspaceBaseController
     {
         await _employee.Delete(id);
         TempData["Success"] = "Работник удалён.";
-        return RedirectToAction(nameof(Index), new { page });
+        return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 }

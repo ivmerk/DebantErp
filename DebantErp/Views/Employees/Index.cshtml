@@ -3,6 +3,8 @@
 
 @{
     ViewData["Title"] = "Работники";
+    var ro = !Model.Edit;                                              // режим просмотра
+    var inCls = ro ? "form-control-plaintext form-control-sm" : "form-control form-control-sm";
 }
 
 <nav aria-label="breadcrumb">
@@ -12,7 +14,17 @@
     </ol>
 </nav>
 
-<h1 class="mb-3">Работники</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Работники</h1>
+    @if (Model.Edit)
+    {
+        <a class="btn btn-outline-secondary" asp-action="Index" asp-route-page="@Model.Page">Готово</a>
+    }
+    else
+    {
+        <a class="btn btn-primary" asp-action="Index" asp-route-page="@Model.Page" asp-route-edit="true">Изменить</a>
+    }
+</div>
 
 @if (TempData["Success"] != null)
 {
@@ -29,45 +41,48 @@
     </div>
 }
 
-<form asp-controller="Employees" asp-action="Create" method="post" class="card card-body mb-4">
-    <h5 class="card-title">Новый работник</h5>
-    <div class="row g-2">
-        <div class="col-md-4">
-            <input name="LastName" class="form-control" placeholder="Фамилия" required maxlength="50" />
+@if (Model.Edit)
+{
+    <form asp-controller="Employees" asp-action="Create" method="post" class="card card-body mb-4">
+        <h5 class="card-title">Новый работник</h5>
+        <div class="row g-2">
+            <div class="col-md-4">
+                <input name="LastName" class="form-control" placeholder="Фамилия" required maxlength="50" />
+            </div>
+            <div class="col-md-4">
+                <input name="FirstName" class="form-control" placeholder="Имя" required maxlength="50" />
+            </div>
+            <div class="col-md-4">
+                <input name="MiddleName" class="form-control" placeholder="Отчество" required maxlength="50" />
+            </div>
+            <div class="col-md-4">
+                <input name="Phone" class="form-control" placeholder="Телефон" required />
+            </div>
+            <div class="col-md-4">
+                <input name="Email" type="email" class="form-control" placeholder="Почта" required />
+            </div>
+            <div class="col-md-4">
+                <input name="TaxCode" class="form-control" placeholder="ИНН" required />
+            </div>
+            <div class="col-md-4">
+                <input name="Address" class="form-control" placeholder="Адрес" required />
+            </div>
+            <div class="col-md-4">
+                <input name="BirthDate" type="date" class="form-control" required />
+            </div>
+            <div class="col-md-4">
+                <select name="Gender" class="form-select" required>
+                    <option value="" disabled selected>Пол</option>
+                    <option value="male">Мужской</option>
+                    <option value="female">Женский</option>
+                </select>
+            </div>
         </div>
-        <div class="col-md-4">
-            <input name="FirstName" class="form-control" placeholder="Имя" required maxlength="50" />
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Добавить</button>
         </div>
-        <div class="col-md-4">
-            <input name="MiddleName" class="form-control" placeholder="Отчество" required maxlength="50" />
-        </div>
-        <div class="col-md-4">
-            <input name="Phone" class="form-control" placeholder="Телефон" required />
-        </div>
-        <div class="col-md-4">
-            <input name="Email" type="email" class="form-control" placeholder="Почта" required />
-        </div>
-        <div class="col-md-4">
-            <input name="TaxCode" class="form-control" placeholder="ИНН" required />
-        </div>
-        <div class="col-md-4">
-            <input name="Address" class="form-control" placeholder="Адрес" required />
-        </div>
-        <div class="col-md-4">
-            <input name="BirthDate" type="date" class="form-control" required />
-        </div>
-        <div class="col-md-4">
-            <select name="Gender" class="form-select" required>
-                <option value="" disabled selected>Пол</option>
-                <option value="male">Мужской</option>
-                <option value="female">Женский</option>
-            </select>
-        </div>
-    </div>
-    <div class="mt-3">
-        <button type="submit" class="btn btn-primary">Добавить</button>
-    </div>
-</form>
+    </form>
+}
 
 @if (Model.Items.Count == 0)
 {
@@ -97,64 +112,77 @@ else
                               asp-route-page="@Model.Page" method="post">
                             <div class="row g-2 align-items-center">
                                 <div class="col">
-                                    <input name="LastName" value="@e.LastName" class="form-control form-control-sm"
+                                    <input name="LastName" value="@e.LastName" class="@inCls" readonly="@ro"
                                            required maxlength="50" />
                                 </div>
                                 <div class="col">
-                                    <input name="FirstName" value="@e.FirstName" class="form-control form-control-sm"
+                                    <input name="FirstName" value="@e.FirstName" class="@inCls" readonly="@ro"
                                            required maxlength="50" />
                                 </div>
                                 <div class="col">
-                                    <input name="MiddleName" value="@e.MiddleName" class="form-control form-control-sm"
+                                    <input name="MiddleName" value="@e.MiddleName" class="@inCls" readonly="@ro"
                                            required maxlength="50" />
                                 </div>
                                 <div class="col-auto">
                                     <button type="button" class="btn btn-sm btn-outline-secondary"
                                             data-bs-toggle="collapse" data-bs-target="#details-@e.Id">Детали</button>
-                                    <button type="submit" class="btn btn-sm btn-outline-primary">Сохранить</button>
+                                    @if (Model.Edit)
+                                    {
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Сохранить</button>
+                                    }
                                 </div>
                             </div>
                             <div class="collapse mt-2" id="details-@e.Id">
                                 <div class="row g-2">
                                     <div class="col-md-4">
                                         <label class="form-label form-label-sm mb-0">Телефон</label>
-                                        <input name="Phone" value="@d.Phone" class="form-control form-control-sm" />
+                                        <input name="Phone" value="@d.Phone" class="@inCls" readonly="@ro" />
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label form-label-sm mb-0">Почта</label>
-                                        <input name="Email" type="email" value="@d.Email" class="form-control form-control-sm" />
+                                        <input name="Email" type="email" value="@d.Email" class="@inCls" readonly="@ro" />
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label form-label-sm mb-0">ИНН</label>
-                                        <input name="TaxCode" value="@d.TaxCode" class="form-control form-control-sm" />
+                                        <input name="TaxCode" value="@d.TaxCode" class="@inCls" readonly="@ro" />
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label form-label-sm mb-0">Адрес</label>
-                                        <input name="Address" value="@d.Address" class="form-control form-control-sm" />
+                                        <input name="Address" value="@d.Address" class="@inCls" readonly="@ro" />
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label form-label-sm mb-0">Дата рождения</label>
                                         <input name="BirthDate" type="date"
                                                value="@(birthDate == default ? "" : birthDate.ToString("yyyy-MM-dd"))"
-                                               class="form-control form-control-sm" />
+                                               class="@inCls" readonly="@ro" />
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label form-label-sm mb-0">Пол</label>
-                                        <select name="Gender" class="form-select form-select-sm">
-                                            <option value="male" selected="@isMale">Мужской</option>
-                                            <option value="female" selected="@(!isMale)">Женский</option>
-                                        </select>
+                                        @if (Model.Edit)
+                                        {
+                                            <select name="Gender" class="form-select form-select-sm">
+                                                <option value="male" selected="@isMale">Мужской</option>
+                                                <option value="female" selected="@(!isMale)">Женский</option>
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            <input class="@inCls" readonly value="@(isMale ? "Мужской" : "Женский")" />
+                                        }
                                     </div>
                                 </div>
                             </div>
                         </form>
                     </td>
                     <td>
-                        <form asp-controller="Employees" asp-action="Delete" asp-route-id="@e.Id"
-                              asp-route-page="@Model.Page" method="post"
-                              onsubmit="return confirm('Удалить работника «@e.LastName @e.FirstName»?');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
-                        </form>
+                        @if (Model.Edit)
+                        {
+                            <form asp-controller="Employees" asp-action="Delete" asp-route-id="@e.Id"
+                                  asp-route-page="@Model.Page" method="post"
+                                  onsubmit="return confirm('Удалить работника «@e.LastName @e.FirstName»?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                            </form>
+                        }
                     </td>
                 </tr>
             }
@@ -166,16 +194,16 @@ else
         <nav aria-label="Пагинация">
             <ul class="pagination">
                 <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page - 1)">Назад</a>
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-edit="@Model.Edit">Назад</a>
                 </li>
                 @for (var p = 1; p <= Model.TotalPages; p++)
                 {
                     <li class="page-item @(p == Model.Page ? "active" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="@p">@p</a>
+                        <a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-edit="@Model.Edit">@p</a>
                     </li>
                 }
                 <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)">Вперёд</a>
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-edit="@Model.Edit">Вперёд</a>
                 </li>
             </ul>
         </nav>
