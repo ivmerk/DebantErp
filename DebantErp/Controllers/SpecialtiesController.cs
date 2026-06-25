@@ -19,9 +19,8 @@ public class SpecialtiesController : WorkspaceBaseController
     [HttpGet("")]
     public async Task<IActionResult> Index(int page = 1, bool edit = false)
     {
-        var all = (await _specialty.GetSpecialties())
-            .Where(s => s.IsActual)            // мягко удалённые не показываем
-            .OrderBy(s => s.Name)              // сортировка по названию
+        var all = (await _specialty.GetSpecialties())   // мягко удалённых отсекает DAL
+            .OrderBy(s => s.Name)                        // сортировка по названию
             .ToList();
 
         var totalPages = Math.Max(1, (int)Math.Ceiling(all.Count / (double)PageSize));

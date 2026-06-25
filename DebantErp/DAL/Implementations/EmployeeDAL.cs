@@ -8,7 +8,7 @@ namespace DebantErp.DAL
         public async Task<List<EmployeeModel>> Get()
         {
             var result = await DbHelper.QueryAsync<EmployeeModel>(
-                "SELECT * FROM employees",
+                "SELECT * FROM employees WHERE is_actual = true",
                 new { }
             );
             return result.ToList();

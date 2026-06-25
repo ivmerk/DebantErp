@@ -7,7 +7,7 @@ namespace DebantErp.DAL
     public async Task<List<SpecialtyModel>> Get()
     {
       var result = await DbHelper.QueryAsync<SpecialtyModel>(
-          "SELECT * FROM specialties",
+          "SELECT * FROM specialties WHERE is_actual = true",
           new { }
       );
       return result.ToList();

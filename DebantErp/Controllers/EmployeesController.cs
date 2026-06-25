@@ -30,8 +30,7 @@ public class EmployeesController : WorkspaceBaseController
     [HttpGet("")]
     public async Task<IActionResult> Index(int page = 1, bool edit = false)
     {
-        var all = (await _employee.Get())
-            .Where(e => bool.TryParse(e.IsActual, out var actual) && actual) // мягко удалённых не показываем
+        var all = (await _employee.Get())                                     // мягко удалённых отсекает DAL
             .OrderBy(e => e.LastName).ThenBy(e => e.FirstName)                // сортировка по фамилии
             .ToList();
 
@@ -65,7 +64,7 @@ public class EmployeesController : WorkspaceBaseController
             Page = page,
             TotalPages = totalPages,
             Edit = edit,
-            Specialties = specialties.Where(s => s.IsActual).OrderBy(s => s.Name).ToList(),
+            Specialties = specialties.OrderBy(s => s.Name).ToList(),
         });
     }
 
