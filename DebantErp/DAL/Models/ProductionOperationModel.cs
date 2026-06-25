@@ -6,6 +6,8 @@ namespace DebantErp.DAL.Models
 
         public string Name { get; set; } = null!;
 
+        public bool IsActual { get; set; } = true;
+
         public DateTime CreatedAt { get; set; }
     }
 }

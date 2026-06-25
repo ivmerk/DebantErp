@@ -1,6 +1,7 @@
 create table if not exists production_operations (
   id serial primary key,
   name varchar(50) not null,
+  is_actual boolean default true,
   created_at timestamptz default now()
 );
 

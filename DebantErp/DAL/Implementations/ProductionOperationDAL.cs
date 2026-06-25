@@ -7,7 +7,7 @@ namespace DebantErp.DAL
         public async Task<List<ProductionOperationModel>> Get()
         {
             var result = await DbHelper.QueryAsync<ProductionOperationModel>(
-                "SELECT * FROM production_operations",
+                "SELECT * FROM production_operations WHERE is_actual = true",
                 new { }
             );
             return result.ToList();
@@ -33,14 +33,17 @@ namespace DebantErp.DAL
             return await DbHelper.ExecuteScalarAsync<bool>(sql, new { id });
         }
 
-        public Task<int> Update(ProductionOperationModel model)
+        public async Task<int> Update(ProductionOperationModel model)
         {
-            throw new NotImplementedException();
+            string sql = "UPDATE production_operations SET name = @name WHERE id = @id";
+            return await DbHelper.ExecuteAsync(sql, model);
         }
 
-        public Task<int> Delete(int id)
+        // Мягкое удаление: запись и связанные расценки сохраняются.
+        public async Task<int> Delete(int id)
         {
-            throw new NotImplementedException();
+            string sql = "UPDATE production_operations SET is_actual = false WHERE id = @id";
+            return await DbHelper.ExecuteAsync(sql, new { id });
         }
     }
 }
