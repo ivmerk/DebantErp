@@ -6,7 +6,7 @@ namespace DebantErp.DAL
     {
         public async Task<List<OrderModel>> Get()
         {
-            var result = await DbHelper.QueryAsync<OrderModel>("SELECT * FROM orders", new { });
+            var result = await DbHelper.QueryAsync<OrderModel>("SELECT * FROM orders WHERE is_deleted = false", new { });
             return result.ToList();
         }
 

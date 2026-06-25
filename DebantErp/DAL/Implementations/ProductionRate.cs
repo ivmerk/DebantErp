@@ -7,7 +7,7 @@ namespace DebantErp.DAL
         public async Task<List<ProductionRateModel>> Get()
         {
             var result = await DbHelper.QueryAsync<ProductionRateModel>(
-                "SELECT * FROM production_rates",
+                "SELECT * FROM production_rates WHERE is_actual = true",
                 new { }
             );
             return result.ToList();

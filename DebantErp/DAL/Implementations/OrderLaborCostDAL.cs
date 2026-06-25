@@ -8,7 +8,7 @@ namespace DebantErp.DAL
     public async Task<List<OrderLaborCostModel>> Get()
     {
       var result = await DbHelper.QueryAsync<OrderLaborCostModel>(
-          "SELECT * FROM order_labor_costs",
+          "SELECT * FROM order_labor_costs WHERE is_deleted = false",
           new { }
       );
       return result.ToList();
