@@ -5,9 +5,9 @@
 
 > **Статус:**
 > - **Операции** — ✅ полностью: UI + BL + DAL (раздел `/workspace/operations`).
-> - **Расценки** — 🧩 каркас: схема, модель и DAL есть, но BL-интерфейс
->   `IProductionRate` пуст, в DI не зарегистрированы, UI нет. Используются как
->   справочник для трудозатрат (`order_labor_costs.production_rate_id`).
+> - **Расценки** — ✅ полностью: UI + BL + DAL (раздел `/workspace/rates`), с
+>   историей версий. Используются как справочник для трудозатрат
+>   (`order_labor_costs.production_rate_id`).
 
 ---
 
@@ -30,14 +30,25 @@
 DAL зарегистрирован как `IProductionOperationDAL`, BL — `IProductionOperation`.
 Плитка «Операции» есть на дашборде.
 
-## Расценки (каркас)
+## Расценки (готово)
 
-| Слой | Файлы | Состояние |
-|------|-------|-----------|
-| Модель | `DAL/Models/ProductionRateModel.cs` | есть |
-| DAL | `DAL/Implementations/ProductionRate.cs` (+ интерфейс) | есть, **не в DI** |
-| BL | `BL/ProductionRate/IProductionRate.cs` | **интерфейс пуст**, реализации нет |
-| DTO / RDO / Контроллер / View | — | нет (раздел «Расценки» — заглушка) |
+Раздел `/workspace/rates`: список действующих расценок (операция · норма времени ·
+ставка), добавление (для операций без действующей расценки), изменение и мягкое
+удаление, режим просмотра/редактирования. **Изменение расценки версионируется** —
+у каждой строки кнопка «История (N)» раскрывает прошлые версии.
+
+| Слой | Файлы |
+|------|-------|
+| Контроллер | `Controllers/RatesController.cs` (`[Route("workspace/rates")]`) |
+| Представление | `Views/Rates/Index.cshtml` |
+| ViewModel | `ViewModels/ProductionRateListViewModel.cs` (`ProductionRateRow` + история) |
+| Бизнес-логика | `BL/ProductionRate/ProductionRate.cs` / `IProductionRate.cs` |
+| Доступ к данным | `DAL/Implementations/ProductionRate.cs` |
+| DTO / RDO | `Dtos/CreateProductionRateDto.cs`, `ChangeProductionRateDto.cs`, `Rdos/ProductionRateRdo.cs` |
+
+`Create`/`Change` в BL реализуют версионирование: при изменении старая версия
+помечается `is_actual = false` (уходит в историю) и вставляется новая действующая.
+Одна действующая расценка на операцию.
 
 ## Модель данных
 
@@ -95,19 +106,13 @@ ORDER BY created_at DESC;
 прошлые трудозатраты остаются привязаны к расценке, действовавшей на момент их
 создания, и не меняются при появлении новой версии.
 
-> ⚠️ Текущий `ProductionRateDAL.Update` меняет строку **на месте** (теряет
-> историю). Когда будет раздел «Расценки», изменение нужно делать
-> версионированием: деактивировать старую версию + вставить новую.
+Версионирование реализовано в `ProductionRate.Change` (BL): деактивирует текущую
+версию (`ProductionRateDAL.Delete` → `is_actual = false`) и вставляет новую
+(`Create`). На экране расценок прошлые версии видны по кнопке «История (N)».
 
-## Что нужно для раздела «Расценки»
+> Примечание: `ProductionRateDAL.Update` (UPDATE на месте) в UI не используется —
+> изменение идёт через версионирование. Метод оставлен в DAL как часть
+> `IBaseDAL`.
 
-1. Описать методы в `IProductionRate` и реализовать BL.
-2. Зарегистрировать DAL и BL в `Program.cs`.
-3. Добавить DTO/RDO, `RatesController : WorkspaceBaseController`
-   (`[Route("workspace/rates")]`) и представления `Views/Rates/` (расценка
-   привязана к операции — нужен выбор операции + норма времени + ставка).
-4. Заменить заглушку в `WorkspaceController` и плитку «Расценки» в
-   `Views/Workspace/Index.cshtml`.
-
-Паттерн — см. [employees-specialties.md](employees-specialties.md) и
+Паттерн UI — см. [employees-specialties.md](employees-specialties.md) и
 [specialties.md](specialties.md).

@@ -11,9 +11,6 @@ public class WorkspaceController : Controller
     public IActionResult Index() => View();
 
     // --- заглушки (наполняются по очереди, потом вынесем в свои контроллеры) ---
-    [HttpGet("rates")]
-    public IActionResult Rates() => View("Section", "Расценки");
-
     [HttpGet("orders")]
     public IActionResult Orders() => View("Section", "Заказы");
 }

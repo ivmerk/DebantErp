@@ -1,0 +1,176 @@
+@using DebantErp.ViewModels
+@model ProductionRateListViewModel
+
+@{
+    ViewData["Title"] = "Расценки";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Workspace" asp-action="Index">Данные</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Расценки</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Расценки</h1>
+    @if (Model.Edit)
+    {
+        <a class="btn btn-outline-secondary" asp-action="Index" asp-route-page="@Model.Page">Готово</a>
+    }
+    else
+    {
+        <a class="btn btn-primary" asp-action="Index" asp-route-page="@Model.Page" asp-route-edit="true">Изменить</a>
+    }
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (Model.Edit)
+{
+    @if (Model.AvailableOperations.Count == 0)
+    {
+        <p class="text-muted">Все операции уже имеют действующую расценку. Новые операции добавляются в разделе «Операции».</p>
+    }
+    else
+    {
+        <form asp-controller="Rates" asp-action="Create" method="post" class="row g-2 mb-4 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label mb-0">Операция</label>
+                <select name="ProductionOperationId" class="form-select" required>
+                    <option value="" disabled selected>Операция…</option>
+                    @foreach (var op in Model.AvailableOperations)
+                    {
+                        <option value="@op.Id">@op.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label mb-0">Норма времени</label>
+                <input name="OperationTimeframe" type="number" min="0" step="1" class="form-control" required />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label mb-0">Ставка</label>
+                <input name="Rate" type="number" min="0" step="0.01" class="form-control" required />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Добавить</button>
+            </div>
+        </form>
+    }
+}
+
+@if (Model.Items.Count == 0)
+{
+    <p class="text-muted">Расценок пока нет.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Операция</th>
+                <th style="width:160px">Норма времени</th>
+                <th style="width:160px">Ставка</th>
+                <th style="width:320px"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.Items)
+            {
+                var r = row.Rate;
+                <tr>
+                    @if (Model.Edit)
+                    {
+                        <td>@r.OperationName</td>
+                        <td colspan="2">
+                            <form asp-controller="Rates" asp-action="Change" asp-route-id="@r.Id"
+                                  asp-route-page="@Model.Page" method="post" class="row g-2">
+                                <div class="col">
+                                    <input name="OperationTimeframe" value="@r.OperationTimeframe" type="number"
+                                           min="0" step="1" class="form-control form-control-sm" required />
+                                </div>
+                                <div class="col">
+                                    <input name="Rate" value="@r.Rate" type="number"
+                                           min="0" step="0.01" class="form-control form-control-sm" required />
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Сохранить</button>
+                                </div>
+                            </form>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    data-bs-toggle="collapse" data-bs-target="#hist-@r.Id"
+                                    @(row.History.Count == 0 ? "disabled" : "")>История (@row.History.Count)</button>
+                            <form asp-controller="Rates" asp-action="Delete" asp-route-id="@r.Id"
+                                  asp-route-page="@Model.Page" method="post" class="d-inline"
+                                  onsubmit="return confirm('Удалить расценку операции «@r.OperationName»?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                            </form>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>@r.OperationName</td>
+                        <td>@r.OperationTimeframe</td>
+                        <td>@r.Rate</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    data-bs-toggle="collapse" data-bs-target="#hist-@r.Id"
+                                    @(row.History.Count == 0 ? "disabled" : "")>История (@row.History.Count)</button>
+                        </td>
+                    }
+                </tr>
+                @if (row.History.Count > 0)
+                {
+                    <tr class="collapse" id="hist-@r.Id">
+                        <td colspan="4" class="bg-light">
+                            <div class="small text-muted mb-1">Прошлые версии:</div>
+                            <ul class="list-unstyled mb-0">
+                                @foreach (var h in row.History)
+                                {
+                                    <li>норма <strong>@h.OperationTimeframe</strong>, ставка <strong>@h.Rate</strong>
+                                        <span class="text-muted">— до @h.CreatedAt.ToString("yyyy-MM-dd")</span></li>
+                                }
+                            </ul>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Пагинация">
+            <ul class="pagination">
+                <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-edit="@Model.Edit">Назад</a>
+                </li>
+                @for (var p = 1; p <= Model.TotalPages; p++)
+                {
+                    <li class="page-item @(p == Model.Page ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-edit="@Model.Edit">@p</a>
+                    </li>
+                }
+                <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-edit="@Model.Edit">Вперёд</a>
+                </li>
+            </ul>
+        </nav>
+    }
+}
