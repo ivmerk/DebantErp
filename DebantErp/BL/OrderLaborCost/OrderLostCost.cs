@@ -28,20 +28,24 @@ namespace DebantErp.BL.OrderLaborCost
     {
       
       var costs = await _orderLaborCostDAL.Get();
-      if (costs == null || costs.Count == 0) throw new Exception("Costs not found");
-      var costsRdo = costs
-        .Select(c => new OrderLaborCostRdo
-        {
-          Id = c.Id,
-          EmployeeId = c.EmployeeId,
-          ProductionRateId = c.ProductionRateId,
-          Quantity = c.Quantity,
-          OrderId = c.OrderId,
-          CreatedAt = c.CreatedAt,
-        })
-        .ToList();
-      return costsRdo;
+      return costs.Select(MapRdo).ToList();
     }
+
+    public async Task<List<OrderLaborCostRdo>> GetByOrder(int orderId)
+    {
+      var costs = await _orderLaborCostDAL.GetByOrderId(orderId);
+      return costs.Select(MapRdo).ToList();
+    }
+
+    private static OrderLaborCostRdo MapRdo(OrderLaborCostModel c) => new()
+    {
+      Id = c.Id,
+      EmployeeId = c.EmployeeId,
+      ProductionRateId = c.ProductionRateId,
+      Quantity = c.Quantity,
+      OrderId = c.OrderId,
+      CreatedAt = c.CreatedAt,
+    };
 
     public async Task<OrderLaborCostRdo> Get(int id) 
     {

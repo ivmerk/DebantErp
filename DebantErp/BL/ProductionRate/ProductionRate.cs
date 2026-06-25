@@ -23,6 +23,13 @@ namespace DebantErp.BL.ProductionRate
             return rates.Select(r => Map(r, names)).ToList();
         }
 
+        public async Task<ProductionRateRdo> GetRate(int id)
+        {
+            var rate = await _rateDAL.Get(id);
+            var names = await OperationNames();
+            return Map(rate, names);
+        }
+
         public async Task<List<ProductionRateRdo>> GetHistory(int operationId)
         {
             var all = await _rateDAL.GetByProductionOperationId(operationId);

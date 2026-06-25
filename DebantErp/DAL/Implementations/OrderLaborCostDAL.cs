@@ -14,6 +14,15 @@ namespace DebantErp.DAL
       return result.ToList();
     }
 
+    public async Task<List<OrderLaborCostModel>> GetByOrderId(int orderId)
+    {
+      var result = await DbHelper.QueryAsync<OrderLaborCostModel>(
+          "SELECT * FROM order_labor_costs WHERE order_id = @orderId AND is_deleted = false",
+          new { orderId }
+      );
+      return result.ToList();
+    }
+
     public async Task<OrderLaborCostModel> Get(int id)
     {
       var result = await DbHelper.QueryAsync<OrderLaborCostModel>(

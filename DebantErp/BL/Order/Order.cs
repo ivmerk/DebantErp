@@ -38,7 +38,6 @@ namespace DebantErp.BL.Order
     public async Task<List<OrderRdo>> Get()
     {
       var orders = await _orderDAL.Get();
-      if (orders == null || orders.Count == 0) throw new Exception("Orders not found");
       var ordersRdo = orders
         .Select(o => new OrderRdo
         {

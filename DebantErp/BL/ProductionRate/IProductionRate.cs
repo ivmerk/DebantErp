@@ -6,6 +6,7 @@ namespace DebantErp.BL.ProductionRate
     public interface IProductionRate
     {
         Task<List<ProductionRateRdo>> GetRates();                  // действующие расценки
+        Task<ProductionRateRdo> GetRate(int id);                   // версия по id (в т.ч. архивная)
         Task<List<ProductionRateRdo>> GetHistory(int operationId); // все версии операции
         Task<int> Create(CreateProductionRateDto dto);             // новая действующая расценка
         Task<int> Change(int id, ChangeProductionRateDto dto);     // новая версия (старая в историю)

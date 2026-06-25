@@ -1,0 +1,124 @@
+@using DebantErp.ViewModels
+@model OrderListViewModel
+
+@{
+    ViewData["Title"] = "Заказы";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Workspace" asp-action="Index">Данные</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Заказы</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Заказы</h1>
+    @if (Model.Edit)
+    {
+        <a class="btn btn-outline-secondary" asp-action="Index" asp-route-page="@Model.Page">Готово</a>
+    }
+    else
+    {
+        <a class="btn btn-primary" asp-action="Index" asp-route-page="@Model.Page" asp-route-edit="true">Изменить</a>
+    }
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (Model.Edit)
+{
+    <form asp-controller="Orders" asp-action="Create" method="post" class="row g-2 mb-4">
+        <div class="col-auto">
+            <input name="Number" class="form-control" placeholder="Номер заказа" required maxlength="50" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Создать</button>
+        </div>
+    </form>
+}
+
+@if (Model.Items.Count == 0)
+{
+    <p class="text-muted">Заказов пока нет.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Номер</th>
+                <th style="width:160px">Создан</th>
+                <th style="width:320px"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var o in Model.Items)
+            {
+                <tr>
+                    @if (Model.Edit)
+                    {
+                        <td>
+                            <form asp-controller="Orders" asp-action="Edit" asp-route-id="@o.Id"
+                                  asp-route-page="@Model.Page" method="post" class="d-flex gap-2">
+                                <input name="Number" value="@o.Number" class="form-control form-control-sm"
+                                       required maxlength="50" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Сохранить</button>
+                            </form>
+                        </td>
+                        <td>@o.CreatedAt.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@o.Id" asp-route-edit="true">Открыть</a>
+                            <form asp-controller="Orders" asp-action="Delete" asp-route-id="@o.Id"
+                                  asp-route-page="@Model.Page" method="post" class="d-inline"
+                                  onsubmit="return confirm('Удалить заказ «@o.Number»?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                            </form>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>@o.Number</td>
+                        <td>@o.CreatedAt.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@o.Id">Открыть</a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Пагинация">
+            <ul class="pagination">
+                <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-edit="@Model.Edit">Назад</a>
+                </li>
+                @for (var p = 1; p <= Model.TotalPages; p++)
+                {
+                    <li class="page-item @(p == Model.Page ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-edit="@Model.Edit">@p</a>
+                    </li>
+                }
+                <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-edit="@Model.Edit">Вперёд</a>
+                </li>
+            </ul>
+        </nav>
+    }
+}
