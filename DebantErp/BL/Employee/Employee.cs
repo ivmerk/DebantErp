@@ -54,13 +54,31 @@ namespace DebantErp.BL.Employee
             return employeeRdo;
         }
 
+        // Нормализация ФИО: каждое слово с заглавной, остальные строчные, без
+        // крайних пробелов. Поддерживает составные через дефис/пробел:
+        // "ИВАН" -> "Иван", "петров-водкин" -> "Петров-Водкин".
+        private static string Capitalize(string name)
+        {
+            name = (name ?? "").Trim();
+            if (name.Length == 0) return name;
+            var chars = name.ToCharArray();
+            bool startOfWord = true;
+            for (var i = 0; i < chars.Length; i++)
+            {
+                var ch = chars[i];
+                chars[i] = startOfWord ? char.ToUpperInvariant(ch) : char.ToLowerInvariant(ch);
+                startOfWord = ch == ' ' || ch == '-';
+            }
+            return new string(chars);
+        }
+
         public async Task<int> Create(CreateEmployeeDto dto)
         {
             var employee = new EmployeeModel
             {
-                FirstName = dto.FirstName,
-                MiddleName = dto.MiddleName,
-                LastName = dto.LastName,
+                FirstName = Capitalize(dto.FirstName),
+                MiddleName = Capitalize(dto.MiddleName),
+                LastName = Capitalize(dto.LastName),
             };
             var id = await _employeeDAL.Create(employee);
 
@@ -88,11 +106,11 @@ namespace DebantErp.BL.Employee
                 return 0;
             }
             if (!string.IsNullOrWhiteSpace(dto.FirstName))
-                emplotyee.FirstName = dto.FirstName;
+                emplotyee.FirstName = Capitalize(dto.FirstName);
             if (!string.IsNullOrWhiteSpace(dto.MiddleName))
-                emplotyee.MiddleName = dto.MiddleName;
+                emplotyee.MiddleName = Capitalize(dto.MiddleName);
             if (!string.IsNullOrWhiteSpace(dto.LastName))
-                emplotyee.LastName = dto.LastName;
+                emplotyee.LastName = Capitalize(dto.LastName);
             var result = await _employeeDAL.Update(emplotyee);
 
             // Заодно обновляем детали (ИНН, адрес, почта, телефон, дата рождения, пол).
