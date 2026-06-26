@@ -7,6 +7,8 @@ create table if not exists order_labor_costs (
   is_deleted bool default false,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
-
-
 );
+
+-- Быстрый поиск трудозатрат по заказу (GetByOrderId).
+create index if not exists idx_order_labor_costs_order_id
+  on order_labor_costs (order_id);
