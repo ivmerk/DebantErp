@@ -1,4 +1,7 @@
 using DebantErp.BL.Employee;
+using DebantErp.BL.Order;
+using DebantErp.BL.OrderLaborCost;
+using DebantErp.BL.ProductionRate;
 using DebantErp.BL.Specialty;
 using DebantErp.Dtos;
 using DebantErp.ViewModels;
@@ -14,17 +17,26 @@ public class EmployeesController : WorkspaceBaseController
     private readonly IEmployeeDetails _employeeDetails;
     private readonly IEmployeeSpecialtyAssignment _assignment;
     private readonly ISpecialty _specialty;
+    private readonly IOrderLaborCost _laborCost;
+    private readonly IOrder _order;
+    private readonly IProductionRate _rate;
 
     public EmployeesController(
         IEmployee employee,
         IEmployeeDetails employeeDetails,
         IEmployeeSpecialtyAssignment assignment,
-        ISpecialty specialty)
+        ISpecialty specialty,
+        IOrderLaborCost laborCost,
+        IOrder order,
+        IProductionRate rate)
     {
         _employee = employee;
         _employeeDetails = employeeDetails;
         _assignment = assignment;
         _specialty = specialty;
+        _laborCost = laborCost;
+        _order = order;
+        _rate = rate;
     }
 
     [HttpGet("")]
@@ -160,5 +172,60 @@ public class EmployeesController : WorkspaceBaseController
         await _assignment.Delete(assignmentId);
         TempData["Success"] = "Специальность снята.";
         return RedirectToAction(nameof(Index), new { page, edit = true });
+    }
+
+    // Трудозатраты работника за период.
+    [HttpGet("{id:int}/labor-costs")]
+    public async Task<IActionResult> LaborCosts(int id, DateTime? from, DateTime? to)
+    {
+        var employee = await _employee.Get(id);
+        if (employee.Id == 0)
+        {
+            TempData["Error"] = "Работник не найден.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // По умолчанию — текущий месяц.
+        var today = DateTime.Today;
+        var fromDate = (from ?? new DateTime(today.Year, today.Month, 1)).Date;
+        var toDate = (to ?? today).Date;
+
+        var costs = (await _laborCost.GetByEmployee(id))
+            .Where(c => c.CreatedAt.Date >= fromDate && c.CreatedAt.Date <= toDate)
+            .ToList();
+
+        var orderNumbers = (await _order.Get()).ToDictionary(o => o.Id, o => o.Number);
+        var rateCache = new Dictionary<int, Rdos.ProductionRateRdo>();
+        foreach (var c in costs)
+        {
+            if (!rateCache.ContainsKey(c.ProductionRateId))
+                rateCache[c.ProductionRateId] = await _rate.GetRate(c.ProductionRateId);
+        }
+
+        var rows = costs
+            .Select(c =>
+            {
+                var rate = rateCache[c.ProductionRateId];
+                return new EmployeeLaborCostRow
+                {
+                    Date = c.CreatedAt,
+                    OrderNumber = orderNumbers.TryGetValue(c.OrderId, out var num) ? (num ?? $"#{c.OrderId}") : $"#{c.OrderId}",
+                    OperationName = rate.OperationName,
+                    Rate = rate.Rate,
+                    Quantity = c.Quantity,
+                    Sum = rate.Rate * c.Quantity,
+                };
+            })
+            .OrderByDescending(r => r.Date)
+            .ToList();
+
+        return View(new EmployeeLaborCostsViewModel
+        {
+            Employee = employee,
+            From = fromDate,
+            To = toDate,
+            Rows = rows,
+            Total = rows.Sum(r => r.Sum),
+        });
     }
 }

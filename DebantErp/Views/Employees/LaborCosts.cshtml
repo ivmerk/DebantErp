@@ -1,0 +1,72 @@
+@using DebantErp.ViewModels
+@model EmployeeLaborCostsViewModel
+
+@{
+    ViewData["Title"] = "Трудозатраты работника";
+    var fio = $"{Model.Employee.LastName} {Model.Employee.FirstName} {Model.Employee.MiddleName}".Trim();
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Workspace" asp-action="Index">Данные</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Employees" asp-action="Index">Работники</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Трудозатраты</li>
+    </ol>
+</nav>
+
+<h1 class="mb-1">Трудозатраты</h1>
+<p class="text-muted">@fio</p>
+
+<form asp-controller="Employees" asp-action="LaborCosts" asp-route-id="@Model.Employee.Id"
+      method="get" class="row g-2 mb-4 align-items-end">
+    <div class="col-auto">
+        <label class="form-label mb-0">С</label>
+        <input name="from" type="date" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+    <div class="col-auto">
+        <label class="form-label mb-0">По</label>
+        <input name="to" type="date" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Показать</button>
+    </div>
+</form>
+
+@if (Model.Rows.Count == 0)
+{
+    <p class="text-muted">За выбранный период трудозатрат нет.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th style="width:130px">Дата</th>
+                <th>Заказ</th>
+                <th>Операция</th>
+                <th style="width:110px">Ставка</th>
+                <th style="width:110px">Кол-во</th>
+                <th style="width:120px">Сумма</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Rows)
+            {
+                <tr>
+                    <td>@r.Date.ToString("yyyy-MM-dd")</td>
+                    <td>@r.OrderNumber</td>
+                    <td>@r.OperationName</td>
+                    <td>@r.Rate</td>
+                    <td>@r.Quantity</td>
+                    <td>@r.Sum</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="5" class="text-end">Итого за период:</th>
+                <th>@Model.Total</th>
+            </tr>
+        </tfoot>
+    </table>
+}

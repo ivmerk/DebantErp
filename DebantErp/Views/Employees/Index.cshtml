@@ -125,6 +125,7 @@ else
                 <div class="col-auto">
                   <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse"
                           data-bs-target="#details-@e.Id">Детали</button>
+                  <a class="btn btn-sm btn-outline-info" asp-action="LaborCosts" asp-route-id="@e.Id">Трудозатраты</a>
                   @if (Model.Edit)
                   {
                     <button type="submit" class="btn btn-sm btn-outline-primary">Сохранить</button>
