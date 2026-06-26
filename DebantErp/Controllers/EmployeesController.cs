@@ -190,11 +190,14 @@ public class EmployeesController : WorkspaceBaseController
         var fromDate = (from ?? new DateTime(today.Year, today.Month, 1)).Date;
         var toDate = (to ?? today).Date;
 
+        // Период фильтруется по дате заказа (отдельной даты у трудозатраты нет).
+        var orders = (await _order.Get()).ToDictionary(o => o.Id, o => o);
+
         var costs = (await _laborCost.GetByEmployee(id))
-            .Where(c => c.CreatedAt.Date >= fromDate && c.CreatedAt.Date <= toDate)
+            .Where(c => orders.TryGetValue(c.OrderId, out var o)
+                        && o.CreatedAt.Date >= fromDate && o.CreatedAt.Date <= toDate)
             .ToList();
 
-        var orderNumbers = (await _order.Get()).ToDictionary(o => o.Id, o => o.Number);
         var rateCache = new Dictionary<int, Rdos.ProductionRateRdo>();
         foreach (var c in costs)
         {
@@ -205,11 +208,12 @@ public class EmployeesController : WorkspaceBaseController
         var rows = costs
             .Select(c =>
             {
+                var order = orders[c.OrderId];
                 var rate = rateCache[c.ProductionRateId];
                 return new EmployeeLaborCostRow
                 {
-                    Date = c.CreatedAt,
-                    OrderNumber = orderNumbers.TryGetValue(c.OrderId, out var num) ? (num ?? $"#{c.OrderId}") : $"#{c.OrderId}",
+                    Date = order.CreatedAt,
+                    OrderNumber = order.Number ?? $"#{c.OrderId}",
                     OperationName = rate.OperationName,
                     Rate = rate.Rate,
                     Quantity = c.Quantity,
