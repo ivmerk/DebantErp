@@ -66,6 +66,11 @@ public class OrdersController : WorkspaceBaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, UpdateOrderDto dto, int page = 1)
     {
+        if ((await _order.Get(id)).Id == 0)
+        {
+            TempData["Error"] = "Заказ не найден.";
+            return RedirectToAction(nameof(Index), new { page, edit = true });
+        }
         try
         {
             await _order.Update(id, dto);
@@ -82,6 +87,11 @@ public class OrdersController : WorkspaceBaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id, int page = 1)
     {
+        if ((await _order.Get(id)).Id == 0)
+        {
+            TempData["Error"] = "Заказ не найден.";
+            return RedirectToAction(nameof(Index), new { page, edit = true });
+        }
         await _order.Delete(id);
         TempData["Success"] = "Заказ удалён.";
         return RedirectToAction(nameof(Index), new { page, edit = true });
@@ -103,11 +113,20 @@ public class OrdersController : WorkspaceBaseController
         var empNames = employees.ToDictionary(e => e.Id, e => $"{e.LastName} {e.FirstName}");
 
         var costs = await _laborCost.GetByOrder(id);
-        var views = new List<LaborCostView>();
+
+        // Расценку каждой версии резолвим один раз (несколько строк могут ссылаться
+        // на одну расценку) — иначе GetRate дёргается на каждую трудозатрату.
+        var rateCache = new Dictionary<int, Rdos.ProductionRateRdo>();
         foreach (var c in costs)
         {
-            var rate = await _rate.GetRate(c.ProductionRateId);
-            views.Add(new LaborCostView
+            if (!rateCache.ContainsKey(c.ProductionRateId))
+                rateCache[c.ProductionRateId] = await _rate.GetRate(c.ProductionRateId);
+        }
+
+        var views = costs.Select(c =>
+        {
+            var rate = rateCache[c.ProductionRateId];
+            return new LaborCostView
             {
                 Id = c.Id,
                 EmployeeName = empNames.TryGetValue(c.EmployeeId, out var n) ? n : $"#{c.EmployeeId}",
@@ -115,8 +134,8 @@ public class OrdersController : WorkspaceBaseController
                 Rate = rate.Rate,
                 Quantity = c.Quantity,
                 Sum = rate.Rate * c.Quantity,
-            });
-        }
+            };
+        }).ToList();
 
         return View(new OrderDetailsViewModel
         {
@@ -158,6 +177,11 @@ public class OrdersController : WorkspaceBaseController
             TempData["Error"] = "Количество должно быть больше нуля.";
             return RedirectToAction(nameof(Details), new { id, edit = true });
         }
+        if ((await _laborCost.Get(costId)).OrderId != id)
+        {
+            TempData["Error"] = "Трудозатрата не относится к этому заказу.";
+            return RedirectToAction(nameof(Details), new { id, edit = true });
+        }
         await _laborCost.Update(costId, new UpdateOrderLaborCostDto { Quantity = quantity });
         TempData["Success"] = "Количество обновлено.";
         return RedirectToAction(nameof(Details), new { id, edit = true });
@@ -167,6 +191,11 @@ public class OrdersController : WorkspaceBaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteLaborCost(int id, int costId)
     {
+        if ((await _laborCost.Get(costId)).OrderId != id)
+        {
+            TempData["Error"] = "Трудозатрата не относится к этому заказу.";
+            return RedirectToAction(nameof(Details), new { id, edit = true });
+        }
         await _laborCost.Delete(costId);
         TempData["Success"] = "Трудозатрата удалена.";
         return RedirectToAction(nameof(Details), new { id, edit = true });
