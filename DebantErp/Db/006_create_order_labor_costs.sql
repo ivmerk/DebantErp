@@ -9,6 +9,11 @@ create table if not exists order_labor_costs (
   updated_at timestamptz default now()
 );
 
--- Быстрый поиск трудозатрат по заказу (GetByOrderId).
+-- Быстрый поиск действующих трудозатрат по заказу и по работнику.
+-- Частичные индексы (только is_deleted = false) — мягко удалённые в выборки
+-- не попадают, индексы меньше и точнее под запросы.
 create index if not exists idx_order_labor_costs_order_id
-  on order_labor_costs (order_id);
+  on order_labor_costs (order_id) where is_deleted = false;
+
+create index if not exists idx_order_labor_costs_employee_id
+  on order_labor_costs (employee_id) where is_deleted = false;
