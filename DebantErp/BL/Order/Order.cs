@@ -53,7 +53,13 @@ namespace DebantErp.BL.Order
     {
       var order = await _orderDAL.Get(id);
       if (order == null) throw new Exception("Order not found");
-      if (dto.Number != null) order.Number = dto.Number;
+      // Проверяем дубликат только если номер реально меняется — иначе IsNumberExist
+      // нашёл бы сам редактируемый заказ.
+      if (dto.Number != null && dto.Number != order.Number)
+      {
+        if (await _orderDAL.IsNumberExist(dto.Number)) throw new Exception("Order already exist");
+        order.Number = dto.Number;
+      }
       return await _orderDAL.Update(order);
     }
     public async Task<int> Delete(int id)

@@ -66,8 +66,15 @@ public class OrdersController : WorkspaceBaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, UpdateOrderDto dto, int page = 1)
     {
-        await _order.Update(id, dto);
-        TempData["Success"] = "Заказ обновлён.";
+        try
+        {
+            await _order.Update(id, dto);
+            TempData["Success"] = "Заказ обновлён.";
+        }
+        catch (Exception)
+        {
+            TempData["Error"] = $"Заказ «{dto.Number}» уже существует.";
+        }
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 
