@@ -37,6 +37,12 @@ namespace DebantErp.BL.OrderLaborCost
       return costs.Select(MapRdo).ToList();
     }
 
+    public async Task<List<OrderLaborCostRdo>> GetByEmployee(int employeeId)
+    {
+      var costs = await _orderLaborCostDAL.GetByEmployeeId(employeeId);
+      return costs.Select(MapRdo).ToList();
+    }
+
     private static OrderLaborCostRdo MapRdo(OrderLaborCostModel c) => new()
     {
       Id = c.Id,

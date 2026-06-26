@@ -7,6 +7,7 @@ namespace DebantErp.BL.OrderLaborCost
   {
     Task<List<OrderLaborCostRdo>> Get();
     Task<List<OrderLaborCostRdo>> GetByOrder(int orderId);
+    Task<List<OrderLaborCostRdo>> GetByEmployee(int employeeId);
     Task<OrderLaborCostRdo> Get(int id);
     Task<int> Create(CreateOrderLaborCostDto dto);
     Task<int> Update(int id, UpdateOrderLaborCostDto dto);
