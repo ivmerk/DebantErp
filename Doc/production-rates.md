@@ -26,6 +26,9 @@
 | Доступ к данным | `DAL/Implementations/ProductionOperationDAL.cs` |
 | DTO / RDO | `Dtos/CreateUpdateProductionOperationDto.cs`, `Rdos/ProductionOperationRdo.cs` |
 
+Наименование нормализуется на сохранении (первая буква заглавная, остальные
+строчные, без крайних пробелов): «ПОШИВ» → «Пошив».
+
 Маршрут `[Route("workspace/operations")]`, экшены `Index/Create/Edit/Delete`.
 DAL зарегистрирован как `IProductionOperationDAL`, BL — `IProductionOperation`.
 Плитка «Операции» есть на дашборде.

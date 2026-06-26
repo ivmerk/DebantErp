@@ -28,9 +28,18 @@ namespace DebantErp.BL.ProductionRate
             return new ProductionOperationRdo { Id = operation.Id, Name = operation.Name };
         }
 
+        // Нормализация наименования: первая буква заглавная, остальные строчные,
+        // без крайних пробелов (как у специальностей). "ПОШИВ" -> "Пошив".
+        private static string Capitalize(string name)
+        {
+            name = (name ?? "").Trim();
+            if (name.Length == 0) return name;
+            return char.ToUpperInvariant(name[0]) + name[1..].ToLowerInvariant();
+        }
+
         public async Task<int> Create(CreateUpdateProductionOperationDto dto)
         {
-            var model = new ProductionOperationModel { Name = (dto.Name ?? "").Trim() };
+            var model = new ProductionOperationModel { Name = Capitalize(dto.Name) };
             return await _operationDAL.Create(model);
         }
 
@@ -41,7 +50,7 @@ namespace DebantErp.BL.ProductionRate
             {
                 return 0;
             }
-            operation.Name = (dto.Name ?? "").Trim();
+            operation.Name = Capitalize(dto.Name);
             return await _operationDAL.Update(operation);
         }
 
