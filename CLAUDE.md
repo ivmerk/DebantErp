@@ -25,7 +25,9 @@ dotnet test DebantErpTest/DebantErpTest.csproj
 App runs at `http://localhost:5010` in the `http` profile.  
 pgAdmin is available at `http://localhost:8083` (email: `ivan.e.merkulov@gmail.com`, password: `test`).
 
-**SQL migrations must be run manually** against the database in order: `Db/001_*.sql` through `Db/007_*.sql`. There is no migration runner.
+**SQL migrations** live in `Db/NNN_*.sql` and apply in numeric order. Locally they must be run manually against the database (there is no dev runner). On deploy the `migrator` service (`Dockerfile.migrator` + `scripts/migrate.sh`) applies each unapplied file once, tracked in a `_migrations` table.
+
+**Migrations are append-only — never edit a file that may already be applied** (unless a note here says otherwise). Because the runner skips files recorded in `_migrations`, editing an applied migration silently diverges environments that already ran the old version (schema drift). Any schema change goes in a *new* forward `NNN_*.sql` file, written idempotently (`add column if not exists`, `drop index if exists` + recreate, etc.).
 
 ## Architecture
 
