@@ -36,11 +36,18 @@ public class ProductionOperationsController : WorkspaceBaseController
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "Назва не може бути порожньою.";
+            TempData["Error"] = "Перевірте назву та код операції.";
             return RedirectToAction(nameof(Index), new { edit = true });
         }
-        await _operation.Create(dto);
-        TempData["Success"] = $"Операцію «{dto.Name}» додано.";
+        try
+        {
+            await _operation.Create(dto);
+            TempData["Success"] = $"Операцію «{dto.Name}» додано.";
+        }
+        catch (Exception)
+        {
+            TempData["Error"] = $"Операція з кодом «{dto.Code}» вже існує.";
+        }
         return RedirectToAction(nameof(Index), new { edit = true });
     }
 
@@ -50,11 +57,18 @@ public class ProductionOperationsController : WorkspaceBaseController
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "Назва не може бути порожньою.";
+            TempData["Error"] = "Перевірте назву та код операції.";
             return RedirectToAction(nameof(Index), new { page, edit = true });
         }
-        await _operation.Update(id, dto);
-        TempData["Success"] = "Операцію оновлено.";
+        try
+        {
+            await _operation.Update(id, dto);
+            TempData["Success"] = "Операцію оновлено.";
+        }
+        catch (Exception)
+        {
+            TempData["Error"] = $"Операція з кодом «{dto.Code}» вже існує.";
+        }
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 

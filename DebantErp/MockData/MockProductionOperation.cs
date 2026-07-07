@@ -22,20 +22,20 @@ public class MockProductionOperation
         if (operationCount > 0)
             return;
 
-        var operations = new List<string>
+        var operations = new List<object>
         {
-            "Порізка дна",
-            "Порізка петлі",
-            "Порізка манжети",
-            "Друк тіла",
+            new { Name = "Порізка дна", Code = "CUT-BOTTOM" },
+            new { Name = "Порізка петлі", Code = "CUT-LOOP" },
+            new { Name = "Порізка манжети", Code = "CUT-CUFF" },
+            new { Name = "Друк тіла", Code = "PRINT-BODY" },
         };
         try
         {
             foreach (var operation in operations)
             {
                 string insertOperationSql =
-                    @"INSERT INTO production_operations (name) VALUES (@Name)";
-                await connection.ExecuteAsync(insertOperationSql, new { Name = operation });
+                    @"INSERT INTO production_operations (name, code) VALUES (@Name, @Code)";
+                await connection.ExecuteAsync(insertOperationSql, operation);
             }
         }
         catch (Exception ex)

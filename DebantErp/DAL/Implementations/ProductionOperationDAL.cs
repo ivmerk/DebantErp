@@ -24,7 +24,7 @@ namespace DebantErp.DAL
 
         public async Task<int> Create(ProductionOperationModel model)
         {
-            string sql = "INSERT INTO production_operations ( name ) VALUES (@name) RETURNING id";
+            string sql = "INSERT INTO production_operations ( name, code ) VALUES (@name, @code) RETURNING id";
             return await DbHelper.ExecuteScalarAsync<int>(sql, model);
         }
         public async Task<bool> IsExist(int id)
@@ -33,9 +33,23 @@ namespace DebantErp.DAL
             return await DbHelper.ExecuteScalarAsync<bool>(sql, new { id });
         }
 
+        // Код уникален по всей таблице (в т.ч. среди мягко удалённых) — под стать
+        // ограничению uq_production_operations_code.
+        public async Task<bool> IsCodeExist(string code)
+        {
+            string sql = "SELECT EXISTS (SELECT 1 FROM production_operations WHERE code = @code)";
+            return await DbHelper.ExecuteScalarAsync<bool>(sql, new { code });
+        }
+
+        public async Task<bool> IsCodeExistForOther(string code, int id)
+        {
+            string sql = "SELECT EXISTS (SELECT 1 FROM production_operations WHERE code = @code AND id <> @id)";
+            return await DbHelper.ExecuteScalarAsync<bool>(sql, new { code, id });
+        }
+
         public async Task<int> Update(ProductionOperationModel model)
         {
-            string sql = "UPDATE production_operations SET name = @name WHERE id = @id";
+            string sql = "UPDATE production_operations SET name = @name, code = @code WHERE id = @id";
             return await DbHelper.ExecuteAsync(sql, model);
         }
 

@@ -18,14 +18,14 @@ namespace DebantErp.BL.ProductionRate
         {
             var operations = await _operationDAL.Get();
             return operations
-                .Select(o => new ProductionOperationRdo { Id = o.Id, Name = o.Name })
+                .Select(o => new ProductionOperationRdo { Id = o.Id, Name = o.Name, Code = o.Code })
                 .ToList();
         }
 
         public async Task<ProductionOperationRdo> GetOperation(int id)
         {
             var operation = await _operationDAL.Get(id);
-            return new ProductionOperationRdo { Id = operation.Id, Name = operation.Name };
+            return new ProductionOperationRdo { Id = operation.Id, Name = operation.Name, Code = operation.Code };
         }
 
         // Нормализация наименования: первая буква заглавная, остальные строчные,
@@ -39,7 +39,12 @@ namespace DebantErp.BL.ProductionRate
 
         public async Task<int> Create(CreateUpdateProductionOperationDto dto)
         {
-            var model = new ProductionOperationModel { Name = Capitalize(dto.Name) };
+            var code = (dto.Code ?? "").Trim();
+            if (await _operationDAL.IsCodeExist(code))
+            {
+                throw new Exception("Operation code already exist");
+            }
+            var model = new ProductionOperationModel { Name = Capitalize(dto.Name), Code = code };
             return await _operationDAL.Create(model);
         }
 
@@ -50,7 +55,14 @@ namespace DebantErp.BL.ProductionRate
             {
                 return 0;
             }
+            var code = (dto.Code ?? "").Trim();
+            // Дубликат кода проверяем среди прочих записей (сама редактируемая не в счёт).
+            if (await _operationDAL.IsCodeExistForOther(code, id))
+            {
+                throw new Exception("Operation code already exist");
+            }
             operation.Name = Capitalize(dto.Name);
+            operation.Code = code;
             return await _operationDAL.Update(operation);
         }
 

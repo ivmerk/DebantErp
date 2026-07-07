@@ -43,6 +43,9 @@
 {
     <form asp-controller="ProductionOperations" asp-action="Create" method="post" class="row g-2 mb-4">
         <div class="col-auto">
+            <input name="Code" class="form-control" placeholder="Код" required maxlength="15" />
+        </div>
+        <div class="col-auto">
             <input name="Name" class="form-control" placeholder="Нова операція" required maxlength="50" />
         </div>
         <div class="col-auto">
@@ -60,6 +63,7 @@ else
     <table class="table table-striped align-middle">
         <thead>
             <tr>
+                <th style="width:160px">Код</th>
                 <th>Назва</th>
                 @if (Model.Edit)
                 {
@@ -73,9 +77,11 @@ else
                 <tr>
                     @if (Model.Edit)
                     {
-                        <td>
+                        <td colspan="2">
                             <form asp-controller="ProductionOperations" asp-action="Edit" asp-route-id="@o.Id"
                                   asp-route-page="@Model.Page" method="post" class="d-flex gap-2">
+                                <input name="Code" value="@o.Code" class="form-control form-control-sm"
+                                       style="max-width:160px" required maxlength="15" />
                                 <input name="Name" value="@o.Name" class="form-control form-control-sm"
                                        required maxlength="50" />
                                 <button type="submit" class="btn btn-sm btn-outline-primary">Зберегти</button>
@@ -91,6 +97,7 @@ else
                     }
                     else
                     {
+                        <td>@o.Code</td>
                         <td>@o.Name</td>
                     }
                 </tr>
