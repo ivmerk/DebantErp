@@ -8,7 +8,7 @@ namespace DebantErp.DAL.Models
 
         public bool IsActual { get; set; } = true;
 
-        public int OperationTimeframe { get; set; }
+        public decimal OperationTimeframe { get; set; }
 
         public decimal Rate { get; set; }
 
