@@ -97,7 +97,7 @@ jobs:
         # StrictHostKeyChecking=accept-new: внутри tailnet identity заверена Tailscale'ом,
         # SSH host-key auto-accept на первом соединении безопасен.
         run: |
-          scp -O \
+          scp -O -v \
             -o StrictHostKeyChecking=accept-new \
             -o UserKnownHostsFile=~/.ssh/known_hosts \
             -i ~/.ssh/id_ed25519 \
@@ -108,7 +108,7 @@ jobs:
         id: deploy
         run: |
           TAG="${{ github.event.inputs.tag || needs.build-push.outputs.tag }}"
-          ssh \
+          ssh -v \
               -o StrictHostKeyChecking=accept-new \
               -o UserKnownHostsFile=~/.ssh/known_hosts \
               -i ~/.ssh/id_ed25519 \
@@ -159,7 +159,7 @@ jobs:
       - name: Rollback on failure
         if: failure() && steps.deploy.outcome == 'failure'
         run: |
-          ssh \
+          ssh -v \
               -o StrictHostKeyChecking=accept-new \
               -o UserKnownHostsFile=~/.ssh/known_hosts \
               -i ~/.ssh/id_ed25519 \
