@@ -30,7 +30,7 @@ public class LoginController : Controller
       try
       {
         await authBL.Authenticate(model.Email!, model.Password!, model.RememberMe == true);
-        return Redirect("/");
+        return Redirect("/workspace");
       }
       catch (DebantErp.BL.AuthorizationException)
       {
