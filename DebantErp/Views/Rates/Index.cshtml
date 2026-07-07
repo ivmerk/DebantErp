@@ -2,25 +2,25 @@
 @model ProductionRateListViewModel
 
 @{
-    ViewData["Title"] = "Расценки";
+    ViewData["Title"] = "Розцінки";
 }
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-controller="Workspace" asp-action="Index">Данные</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Расценки</li>
+        <li class="breadcrumb-item"><a asp-controller="Workspace" asp-action="Index">Дані</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Розцінки</li>
     </ol>
 </nav>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="mb-0">Расценки</h1>
+    <h1 class="mb-0">Розцінки</h1>
     @if (Model.Edit)
     {
         <a class="btn btn-outline-secondary" asp-action="Index" asp-route-page="@Model.Page">Готово</a>
     }
     else
     {
-        <a class="btn btn-primary" asp-action="Index" asp-route-page="@Model.Page" asp-route-edit="true">Изменить</a>
+        <a class="btn btn-primary" asp-action="Index" asp-route-page="@Model.Page" asp-route-edit="true">Змінити</a>
     }
 </div>
 
@@ -43,15 +43,15 @@
 {
     @if (Model.AvailableOperations.Count == 0)
     {
-        <p class="text-muted">Все операции уже имеют действующую расценку. Новые операции добавляются в разделе «Операции».</p>
+        <p class="text-muted">Усі операції вже мають чинну розцінку. Нові операції додаються в розділі «Операції».</p>
     }
     else
     {
         <form asp-controller="Rates" asp-action="Create" method="post" class="row g-2 mb-4 align-items-end">
             <div class="col-md-4">
-                <label class="form-label mb-0">Операция</label>
+                <label class="form-label mb-0">Операція</label>
                 <select name="ProductionOperationId" class="form-select" required>
-                    <option value="" disabled selected>Операция…</option>
+                    <option value="" disabled selected>Операція…</option>
                     @foreach (var op in Model.AvailableOperations)
                     {
                         <option value="@op.Id">@op.Name</option>
@@ -59,7 +59,7 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label class="form-label mb-0">Норма времени</label>
+                <label class="form-label mb-0">Норма часу</label>
                 <input name="OperationTimeframe" type="number" min="0" step="1" class="form-control" required />
             </div>
             <div class="col-md-3">
@@ -67,7 +67,7 @@
                 <input name="Rate" type="number" min="0" step="0.01" class="form-control" required />
             </div>
             <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Добавить</button>
+                <button type="submit" class="btn btn-primary w-100">Додати</button>
             </div>
         </form>
     }
@@ -75,15 +75,15 @@
 
 @if (Model.Items.Count == 0)
 {
-    <p class="text-muted">Расценок пока нет.</p>
+    <p class="text-muted">Розцінок поки немає.</p>
 }
 else
 {
     <table class="table table-striped align-middle">
         <thead>
             <tr>
-                <th>Операция</th>
-                <th style="width:160px">Норма времени</th>
+                <th>Операція</th>
+                <th style="width:160px">Норма часу</th>
                 <th style="width:160px">Ставка</th>
                 <th style="width:320px"></th>
             </tr>
@@ -108,18 +108,18 @@ else
                                            min="0" step="0.01" class="form-control form-control-sm" required />
                                 </div>
                                 <div class="col-auto">
-                                    <button type="submit" class="btn btn-sm btn-outline-primary">Сохранить</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Зберегти</button>
                                 </div>
                             </form>
                         </td>
                         <td>
                             <button type="button" class="btn btn-sm btn-outline-secondary"
                                     data-bs-toggle="collapse" data-bs-target="#hist-@r.Id"
-                                    @(row.History.Count == 0 ? "disabled" : "")>История (@row.History.Count)</button>
+                                    @(row.History.Count == 0 ? "disabled" : "")>Історія (@row.History.Count)</button>
                             <form asp-controller="Rates" asp-action="Delete" asp-route-id="@r.Id"
                                   asp-route-page="@Model.Page" method="post" class="d-inline"
-                                  onsubmit="return confirm('Удалить расценку операции «@r.OperationName»?');">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                                  onsubmit="return confirm('Видалити розцінку операції «@r.OperationName»?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Видалити</button>
                             </form>
                         </td>
                     }
@@ -131,7 +131,7 @@ else
                         <td>
                             <button type="button" class="btn btn-sm btn-outline-secondary"
                                     data-bs-toggle="collapse" data-bs-target="#hist-@r.Id"
-                                    @(row.History.Count == 0 ? "disabled" : "")>История (@row.History.Count)</button>
+                                    @(row.History.Count == 0 ? "disabled" : "")>Історія (@row.History.Count)</button>
                         </td>
                     }
                 </tr>
@@ -139,7 +139,7 @@ else
                 {
                     <tr class="collapse" id="hist-@r.Id">
                         <td colspan="4" class="bg-light">
-                            <div class="small text-muted mb-1">Прошлые версии:</div>
+                            <div class="small text-muted mb-1">Попередні версії:</div>
                             <ul class="list-unstyled mb-0">
                                 @foreach (var h in row.History)
                                 {
@@ -156,7 +156,7 @@ else
 
     @if (Model.TotalPages > 1)
     {
-        <nav aria-label="Пагинация">
+        <nav aria-label="Пагінація">
             <ul class="pagination">
                 <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
                     <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-edit="@Model.Edit">Назад</a>
@@ -168,7 +168,7 @@ else
                     </li>
                 }
                 <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-edit="@Model.Edit">Вперёд</a>
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-edit="@Model.Edit">Вперед</a>
                 </li>
             </ul>
         </nav>

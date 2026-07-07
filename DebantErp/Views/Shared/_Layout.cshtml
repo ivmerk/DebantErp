@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 
 <head>
   <meta charset="utf-8" />
@@ -35,31 +35,31 @@
           <ul class="navbar-nav flex-grow-1">
             <li class="nav-item">
               <a class="nav-link text-dark @(GetActive("Home", "Index"))" asp-area="" asp-controller="Home"
-                asp-action="Index">Home</a>
+                asp-action="Index">Головна</a>
             </li>
             <li class="nav-item">
               <a class="nav-link text-dark @(GetActive("Home", "Privacy"))" asp-area="" asp-controller="Home"
-                asp-action="Privacy">Privacy</a>
+                asp-action="Privacy">Конфіденційність</a>
             </li>
             @if (User.Identity?.IsAuthenticated == true)
             {
               <li class="nav-item">
                 <a class="nav-link text-dark @(GetActive("Workspace"))" asp-controller="Workspace"
-                  asp-action="Index">Данные</a>
+                  asp-action="Index">Дані</a>
               </li>
             }
             @if (User.IsInRole("Admin"))
             {
               <li class="nav-item">
                 <a class="nav-link text-dark @(GetActive("Admin"))" asp-controller="Admin"
-                  asp-action="Users">Администрирование</a>
+                  asp-action="Users">Адміністрування</a>
               </li>
             }
             @if (User.Identity?.IsAuthenticated == true)
             {
               <li class="nav-item">
                 <form asp-controller="Login" asp-action="Logout" method="post" class="d-inline">
-                  <button type="submit" class="nav-link text-dark btn btn-link">Выйти</button>
+                  <button type="submit" class="nav-link text-dark btn btn-link">Вийти</button>
                 </form>
               </li>
             }
@@ -67,11 +67,11 @@
             {
               <li class="nav-item">
                 <a class="nav-link text-dark @(GetActive("Login", "Index"))" asp-controller="Login"
-                  asp-action="Index">Войти</a>
+                  asp-action="Index">Увійти</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link text-dark @(GetActive("Register", "Index"))" asp-controller="Register"
-                  asp-action="Index">Регистрация</a>
+                  asp-action="Index">Реєстрація</a>
               </li>
             }
           </ul>
@@ -87,7 +87,7 @@
 
   <footer class="border-top footer text-muted">
     <div class="container">
-      &copy; 2023 - DebantErp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+      &copy; 2023 - DebantErp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Конфіденційність</a>
     </div>
   </footer>
   <script src="~/lib/jquery/dist/jquery.min.js"></script>

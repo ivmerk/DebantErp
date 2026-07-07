@@ -25,11 +25,11 @@ public class MockSpecialtyData
 
         var specialties = new List<object>
         {
-            new { Name = "Швея", IsActual = true },
+            new { Name = "Швачка", IsActual = true },
             new { Name = "Ткач", IsActual = true },
-            new { Name = "Закройщик", IsActual = true },
-            new { Name = "Технолог швейного производства", IsActual = true },
-            new { Name = "Оператор швейного оборудования", IsActual = true },
+            new { Name = "Закрійник", IsActual = true },
+            new { Name = "Технолог швейного виробництва", IsActual = true },
+            new { Name = "Оператор швейного обладнання", IsActual = true },
         };
 
         try

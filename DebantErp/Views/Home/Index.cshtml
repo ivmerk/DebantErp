@@ -1,19 +1,19 @@
-﻿@model bool
+@model bool
 
 @{
-ViewData["Title"] = "Home Page";
+ViewData["Title"] = "Головна";
 }
 
 <div class="text-center">
-  <h1 class="display-4">Welcome</h1>
-  <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+  <h1 class="display-4">Ласкаво просимо</h1>
+  <p>Дізнайтеся більше про <a href="https://docs.microsoft.com/aspnet/core">створення вебзастосунків з ASP.NET Core</a>.</p>
 </div>
 
 @if (Model)
 {
-<h1>Авторизован</h1>
+<h1>Авторизовано</h1>
 }
 else
 {
-<h1>Не Авторизован</h1>
+<h1>Не авторизовано</h1>
 }

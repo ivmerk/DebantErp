@@ -86,17 +86,17 @@ public class EmployeesController : WorkspaceBaseController
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "Проверьте корректность заполнения полей.";
+            TempData["Error"] = "Перевірте правильність заповнення полів.";
             return RedirectToAction(nameof(Index), new { edit = true });
         }
         try
         {
             await _employee.Create(dto);
-            TempData["Success"] = $"Работник «{dto.LastName} {dto.FirstName}» добавлен.";
+            TempData["Success"] = $"Працівника «{dto.LastName} {dto.FirstName}» додано.";
         }
         catch (Exception)
         {
-            TempData["Error"] = "Не удалось добавить работника.";
+            TempData["Error"] = "Не вдалося додати працівника.";
         }
         return RedirectToAction(nameof(Index), new { edit = true });
     }
@@ -107,11 +107,11 @@ public class EmployeesController : WorkspaceBaseController
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "Проверьте корректность заполнения полей.";
+            TempData["Error"] = "Перевірте правильність заповнення полів.";
             return RedirectToAction(nameof(Index), new { page, edit = true });
         }
         await _employee.Update(id, dto);
-        TempData["Success"] = "Данные работника обновлены.";
+        TempData["Success"] = "Дані працівника оновлено.";
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 
@@ -120,7 +120,7 @@ public class EmployeesController : WorkspaceBaseController
     public async Task<IActionResult> Delete(int id, int page = 1)
     {
         await _employee.Delete(id);
-        TempData["Success"] = "Работник удалён.";
+        TempData["Success"] = "Працівника видалено.";
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 
@@ -131,7 +131,7 @@ public class EmployeesController : WorkspaceBaseController
         if (specialtyId <= 0 || string.IsNullOrWhiteSpace(dateFrom)
             || !DateTime.TryParse(dateFrom, out var newDate))
         {
-            TempData["Error"] = "Выберите специальность и дату начала.";
+            TempData["Error"] = "Оберіть спеціальність і дату початку.";
             return RedirectToAction(nameof(Index), new { page, edit = true });
         }
 
@@ -143,7 +143,7 @@ public class EmployeesController : WorkspaceBaseController
             var latest = current.Max(a => a.DateFrom);
             if (newDate.Date < latest.Date)
             {
-                TempData["Error"] = $"Дата начала не может быть раньше последней назначенной специальности ({latest:yyyy-MM-dd}).";
+                TempData["Error"] = $"Дата початку не може бути раніше за останню призначену спеціальність ({latest:yyyy-MM-dd}).";
                 return RedirectToAction(nameof(Index), new { page, edit = true });
             }
         }
@@ -156,11 +156,11 @@ public class EmployeesController : WorkspaceBaseController
                 SpecialtyId = specialtyId,
                 DateFrom = dateFrom,
             });
-            TempData["Success"] = "Специальность назначена.";
+            TempData["Success"] = "Спеціальність призначено.";
         }
         catch (Exception)
         {
-            TempData["Error"] = "Не удалось назначить специальность.";
+            TempData["Error"] = "Не вдалося призначити спеціальність.";
         }
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
@@ -170,7 +170,7 @@ public class EmployeesController : WorkspaceBaseController
     public async Task<IActionResult> RemoveSpecialty(int id, int assignmentId, int page = 1)
     {
         await _assignment.Delete(assignmentId);
-        TempData["Success"] = "Специальность снята.";
+        TempData["Success"] = "Спеціальність знято.";
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 
@@ -181,7 +181,7 @@ public class EmployeesController : WorkspaceBaseController
         var employee = await _employee.Get(id);
         if (employee.Id == 0)
         {
-            TempData["Error"] = "Работник не найден.";
+            TempData["Error"] = "Працівника не знайдено.";
             return RedirectToAction(nameof(Index));
         }
 

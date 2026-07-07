@@ -36,11 +36,11 @@ public class ProductionOperationsController : WorkspaceBaseController
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "Название не может быть пустым.";
+            TempData["Error"] = "Назва не може бути порожньою.";
             return RedirectToAction(nameof(Index), new { edit = true });
         }
         await _operation.Create(dto);
-        TempData["Success"] = $"Операция «{dto.Name}» добавлена.";
+        TempData["Success"] = $"Операцію «{dto.Name}» додано.";
         return RedirectToAction(nameof(Index), new { edit = true });
     }
 
@@ -50,11 +50,11 @@ public class ProductionOperationsController : WorkspaceBaseController
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "Название не может быть пустым.";
+            TempData["Error"] = "Назва не може бути порожньою.";
             return RedirectToAction(nameof(Index), new { page, edit = true });
         }
         await _operation.Update(id, dto);
-        TempData["Success"] = "Операция обновлена.";
+        TempData["Success"] = "Операцію оновлено.";
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 
@@ -63,7 +63,7 @@ public class ProductionOperationsController : WorkspaceBaseController
     public async Task<IActionResult> Delete(int id, int page = 1)
     {
         await _operation.Delete(id);
-        TempData["Success"] = "Операция удалена.";
+        TempData["Success"] = "Операцію видалено.";
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 }

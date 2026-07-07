@@ -36,17 +36,17 @@ public class SpecialtiesController : WorkspaceBaseController
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "Название не может быть пустым.";
+            TempData["Error"] = "Назва не може бути порожньою.";
             return RedirectToAction(nameof(Index), new { edit = true });
         }
         try
         {
             await _specialty.Create(dto);
-            TempData["Success"] = $"Специальность «{dto.Name}» добавлена.";
+            TempData["Success"] = $"Спеціальність «{dto.Name}» додано.";
         }
         catch (Exception)
         {
-            TempData["Error"] = $"Специальность «{dto.Name}» уже существует.";
+            TempData["Error"] = $"Спеціальність «{dto.Name}» вже існує.";
         }
         return RedirectToAction(nameof(Index), new { edit = true });
     }
@@ -57,17 +57,17 @@ public class SpecialtiesController : WorkspaceBaseController
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "Название не может быть пустым.";
+            TempData["Error"] = "Назва не може бути порожньою.";
             return RedirectToAction(nameof(Index), new { page, edit = true });
         }
         try
         {
             await _specialty.Update(id, dto);
-            TempData["Success"] = "Специальность обновлена.";
+            TempData["Success"] = "Спеціальність оновлено.";
         }
         catch (Exception)
         {
-            TempData["Error"] = $"Специальность «{dto.Name}» уже существует.";
+            TempData["Error"] = $"Спеціальність «{dto.Name}» вже існує.";
         }
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
@@ -77,7 +77,7 @@ public class SpecialtiesController : WorkspaceBaseController
     public async Task<IActionResult> Delete(int id, int page = 1)
     {
         await _specialty.Delete(id);
-        TempData["Success"] = "Специальность удалена.";
+        TempData["Success"] = "Спеціальність видалено.";
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 }

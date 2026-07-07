@@ -34,7 +34,7 @@ public class LoginController : Controller
       }
       catch (DebantErp.BL.AuthorizationException)
       {
-        ModelState.AddModelError("Email", "Имя или Email неверные");
+        ModelState.AddModelError("Email", "Ім'я або Email неправильні");
       }
     }
     return View("Index", model);

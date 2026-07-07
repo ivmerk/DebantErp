@@ -137,7 +137,7 @@ public class Auth : IAuth
   {
     var user = await _authDAL.Get(email);
     if (user.Id != null)
-      return new ValidationResult("Пользователь с таким email уже существует.");
+      return new ValidationResult("Користувач з таким email вже існує.");
     return null;
   }
 }

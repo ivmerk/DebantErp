@@ -3,19 +3,19 @@ using System.ComponentModel.DataAnnotations;
 namespace DebantErp.Dtos;
 public class RegisterUserDto
 {
-    [Required(ErrorMessage = "Имя обязательно")]
+    [Required(ErrorMessage = "Ім'я обов'язкове")]
     public string? FirstName { get; set; }
 
-    [Required(ErrorMessage = "Имя обязательно")]
+    [Required(ErrorMessage = "Прізвище обов'язкове")]
     public string? LastName { get; set; }
 
-    [Required(ErrorMessage = "Телефон обязателен")]
+    [Required(ErrorMessage = "Телефон обов'язковий")]
     public string? Phone { get; set; }
 
-    [Required(ErrorMessage = "Email обязателен")]
-    [EmailAddress(ErrorMessage = "Некорректный Email")]
+    [Required(ErrorMessage = "Email обов'язковий")]
+    [EmailAddress(ErrorMessage = "Некоректний Email")]
     public string? Email { get; set; }
 
-    [Required(ErrorMessage = "Пароль обязателен")]
+    [Required(ErrorMessage = "Пароль обов'язковий")]
     public string? Password { get; set; }
 }

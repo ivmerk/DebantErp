@@ -1,12 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace DebantErp.ViewModels;
 public class RegisterViewModel
 {
-    [Required(ErrorMessage = "Email обязателен")]
-    [EmailAddress(ErrorMessage = "Некорректный формат")]
+    [Required(ErrorMessage = "Email обов'язковий")]
+    [EmailAddress(ErrorMessage = "Некоректний формат")]
     public string? Email { get; set; }
-    [Required(ErrorMessage = "Пароль обязателен")]
+    [Required(ErrorMessage = "Пароль обов'язковий")]
  //   [RegularExpression("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#$%^&*-]).{10,}$", ErrorMessage = "Пароль слишком простой")]
     public string? Password { get; set; }
 }

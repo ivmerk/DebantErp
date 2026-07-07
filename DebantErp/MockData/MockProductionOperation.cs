@@ -24,10 +24,10 @@ public class MockProductionOperation
 
         var operations = new List<string>
         {
-            "Порезка дна",
-            "Порезка петли",
-            "Порезка манжеты",
-            "Печать тела",
+            "Порізка дна",
+            "Порізка петлі",
+            "Порізка манжети",
+            "Друк тіла",
         };
         try
         {

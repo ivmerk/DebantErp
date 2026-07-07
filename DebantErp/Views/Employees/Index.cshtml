@@ -2,27 +2,27 @@
 @model EmployeeListViewModel
 
 @{
-  ViewData["Title"] = "Работники";
+  ViewData["Title"] = "Працівники";
   var ro = !Model.Edit; // режим просмотра
   var inCls = ro ? "form-control-plaintext form-control-sm" : "form-control form-control-sm";
 }
 
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a asp-controller="Workspace" asp-action="Index">Данные</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Работники</li>
+    <li class="breadcrumb-item"><a asp-controller="Workspace" asp-action="Index">Дані</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Працівники</li>
   </ol>
 </nav>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="mb-0">Работники</h1>
+  <h1 class="mb-0">Працівники</h1>
   @if (Model.Edit)
   {
     <a class="btn btn-outline-secondary" asp-action="Index" asp-route-page="@Model.Page">Готово</a>
   }
   else
   {
-    <a class="btn btn-primary" asp-action="Index" asp-route-page="@Model.Page" asp-route-edit="true">Изменить</a>
+    <a class="btn btn-primary" asp-action="Index" asp-route-page="@Model.Page" asp-route-edit="true">Змінити</a>
   }
 </div>
 
@@ -44,58 +44,58 @@
 @if (Model.Edit)
 {
   <form asp-controller="Employees" asp-action="Create" method="post" class="card card-body mb-4">
-    <h5 class="card-title">Новый работник</h5>
+    <h5 class="card-title">Новий працівник</h5>
     <div class="row g-2">
       <div class="col-md-4">
-        <input name="LastName" class="form-control" placeholder="Фамилия" required maxlength="50" />
+        <input name="LastName" class="form-control" placeholder="Прізвище" required maxlength="50" />
       </div>
       <div class="col-md-4">
-        <input name="FirstName" class="form-control" placeholder="Имя" required maxlength="50" />
+        <input name="FirstName" class="form-control" placeholder="Ім'я" required maxlength="50" />
       </div>
       <div class="col-md-4">
-        <input name="MiddleName" class="form-control" placeholder="Отчество" required maxlength="50" />
+        <input name="MiddleName" class="form-control" placeholder="По батькові" required maxlength="50" />
       </div>
       <div class="col-md-4">
         <input name="Phone" class="form-control" placeholder="Телефон" required />
       </div>
       <div class="col-md-4">
-        <input name="Email" type="email" class="form-control" placeholder="Почта" required />
+        <input name="Email" type="email" class="form-control" placeholder="Пошта" required />
       </div>
       <div class="col-md-4">
-        <input name="TaxCode" class="form-control" placeholder="ИНН" required />
+        <input name="TaxCode" class="form-control" placeholder="ІПН" required />
       </div>
       <div class="col-md-4">
-        <input name="Address" class="form-control" placeholder="Адрес" required />
+        <input name="Address" class="form-control" placeholder="Адреса" required />
       </div>
       <div class="col-md-4">
         <input name="BirthDate" type="date" class="form-control" required />
       </div>
       <div class="col-md-4">
         <select name="Gender" class="form-select" required>
-          <option value="" disabled selected>Пол</option>
-          <option value="male">Мужской</option>
-          <option value="female">Женский</option>
+          <option value="" disabled selected>Стать</option>
+          <option value="male">Чоловіча</option>
+          <option value="female">Жіноча</option>
         </select>
       </div>
     </div>
     <div class="mt-3">
-      <button type="submit" class="btn btn-primary">Добавить</button>
+      <button type="submit" class="btn btn-primary">Додати</button>
     </div>
   </form>
 }
 
 @if (Model.Items.Count == 0)
 {
-  <p class="text-muted">Работников пока нет.</p>
+  <p class="text-muted">Працівників поки немає.</p>
 }
 else
 {
   <table class="table table-striped align-middle">
     <thead>
       <tr>
-        <th>Фамилия</th>
-        <th>Имя</th>
-        <th>Отчество</th>
+        <th>Прізвище</th>
+        <th>Ім'я</th>
+        <th>По батькові</th>
         <th style="width:320px"></th>
       </tr>
     </thead>
@@ -124,11 +124,11 @@ else
                 </div>
                 <div class="col-auto">
                   <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse"
-                          data-bs-target="#details-@e.Id">Детали</button>
-                  <a class="btn btn-sm btn-outline-info" asp-action="LaborCosts" asp-route-id="@e.Id">Трудозатраты</a>
+                          data-bs-target="#details-@e.Id">Деталі</button>
+                  <a class="btn btn-sm btn-outline-info" asp-action="LaborCosts" asp-route-id="@e.Id">Трудовитрати</a>
                   @if (Model.Edit)
                   {
-                    <button type="submit" class="btn btn-sm btn-outline-primary">Сохранить</button>
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Зберегти</button>
                   }
                 </div>
               </div>
@@ -139,48 +139,48 @@ else
                     <input name="Phone" value="@d.Phone" class="@inCls" readonly="@ro" />
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label form-label-sm mb-0">Почта</label>
+                    <label class="form-label form-label-sm mb-0">Пошта</label>
                     <input name="Email" type="email" value="@d.Email" class="@inCls" readonly="@ro" />
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label form-label-sm mb-0">ИНН</label>
+                    <label class="form-label form-label-sm mb-0">ІПН</label>
                     <input name="TaxCode" value="@d.TaxCode" class="@inCls" readonly="@ro" />
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label form-label-sm mb-0">Адрес</label>
+                    <label class="form-label form-label-sm mb-0">Адреса</label>
                     <input name="Address" value="@d.Address" class="@inCls" readonly="@ro" />
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label form-label-sm mb-0">Дата рождения</label>
+                    <label class="form-label form-label-sm mb-0">Дата народження</label>
                     <input name="BirthDate" type="date"
                            value="@(birthDate == default ? "" : birthDate.ToString("yyyy-MM-dd"))" class="@inCls"
                            readonly="@ro" />
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label form-label-sm mb-0">Пол</label>
+                    <label class="form-label form-label-sm mb-0">Стать</label>
                     @if (Model.Edit)
                     {
                       <select name="Gender" class="form-select form-select-sm">
-                        <option value="male" selected="@isMale">Мужской</option>
-                        <option value="female" selected="@(!isMale)">Женский</option>
+                        <option value="male" selected="@isMale">Чоловіча</option>
+                        <option value="female" selected="@(!isMale)">Жіноча</option>
                       </select>
                     }
                     else
                     {
-                      <input class="@inCls" readonly value="@(isMale ? "Мужской" : "Женский")" />
+                      <input class="@inCls" readonly value="@(isMale ? "Чоловіча" : "Жіноча")" />
                     }
                   </div>
                 </div>
               </div>
             </form>
 
-            @* Специальности работника — показ + (в режиме правки) назначение/снятие.
-                           Формы вынесены ОТДЕЛЬНО от формы редактирования: вложенные <form> недопустимы. *@
+            @* Спеціальності працівника — показ + (у режимі редагування) призначення/зняття.
+                           Форми винесені ОКРЕМО від форми редагування: вкладені <form> неприпустимі. *@
             <div class="mt-2">
-              <span class="text-muted small me-2">Специальность:</span>
+              <span class="text-muted small me-2">Спеціальність:</span>
               @if (row.Assignments.Count == 0)
               {
-                <span class="text-muted small fst-italic">не назначены</span>
+                <span class="text-muted small fst-italic">не призначені</span>
               }
               @foreach (var a in row.Assignments)
               {
@@ -188,12 +188,12 @@ else
                 {
                   <form asp-controller="Employees" asp-action="RemoveSpecialty" asp-route-id="@e.Id"
                         asp-route-assignmentId="@a.Id" asp-route-page="@Model.Page" method="post" class="d-inline-block me-1 mb-1"
-                        onsubmit="return confirm('Снять специальность «@a.SpecialtyName»?');">
+                        onsubmit="return confirm('Зняти спеціальність «@a.SpecialtyName»?');">
                     <span class="badge text-bg-light border">
                       <span class="text-dark fw-semibold">@a.SpecialtyName</span>
-                      <span class="text-dark">с @a.DateFrom.ToString("yyyy-MM-dd")</span>
+                      <span class="text-dark">з @a.DateFrom.ToString("yyyy-MM-dd")</span>
                       <button type="submit" class="btn-close ms-1 align-middle" style="font-size:.6rem"
-                              aria-label="Снять"></button>
+                              aria-label="Зняти"></button>
                     </span>
                   </form>
                 }
@@ -201,7 +201,7 @@ else
                 {
                   <span class="badge text-bg-light border me-1 mb-1">
                     <span class="text-dark fw-semibold">@a.SpecialtyName</span>
-                    <span class="text-muted">с @a.DateFrom.ToString("yyyy-MM-dd")</span>
+                    <span class="text-muted">з @a.DateFrom.ToString("yyyy-MM-dd")</span>
                   </span>
                 }
               }
@@ -212,7 +212,7 @@ else
                       asp-route-page="@Model.Page" method="post" class="row g-2 mt-1">
                   <div class="col-auto">
                     <select name="specialtyId" class="form-select form-select-sm" required>
-                      <option value="" disabled selected>Специальность…</option>
+                      <option value="" disabled selected>Спеціальність…</option>
                       @foreach (var sp in Model.Specialties)
                       {
                         <option value="@sp.Id">@sp.Name</option>
@@ -223,7 +223,7 @@ else
                     <input name="dateFrom" type="date" min="@minFrom" class="form-control form-control-sm" required />
                   </div>
                   <div class="col-auto">
-                    <button type="submit" class="btn btn-sm btn-outline-primary">Назначить</button>
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Призначити</button>
                   </div>
                 </form>
               }
@@ -233,8 +233,8 @@ else
             @if (Model.Edit)
             {
               <form asp-controller="Employees" asp-action="Delete" asp-route-id="@e.Id" asp-route-page="@Model.Page"
-                    method="post" onsubmit="return confirm('Удалить работника «@e.LastName @e.FirstName»?');">
-                <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                    method="post" onsubmit="return confirm('Видалити працівника «@e.LastName @e.FirstName»?');">
+                <button type="submit" class="btn btn-sm btn-outline-danger">Видалити</button>
               </form>
             }
           </td>
@@ -245,7 +245,7 @@ else
 
   @if (Model.TotalPages > 1)
   {
-    <nav aria-label="Пагинация">
+    <nav aria-label="Пагінація">
       <ul class="pagination">
         <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
           <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-edit="@Model.Edit">Назад</a>
@@ -257,7 +257,7 @@ else
           </li>
         }
         <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-          <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-edit="@Model.Edit">Вперёд</a>
+          <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-edit="@Model.Edit">Вперед</a>
         </li>
       </ul>
     </nav>

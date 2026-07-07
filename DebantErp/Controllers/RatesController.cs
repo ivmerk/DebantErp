@@ -64,11 +64,11 @@ public class RatesController : WorkspaceBaseController
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "Проверьте операцию, норму времени и ставку.";
+            TempData["Error"] = "Перевірте операцію, норму часу та ставку.";
             return RedirectToAction(nameof(Index), new { edit = true });
         }
         await _rate.Create(dto);
-        TempData["Success"] = "Расценка добавлена.";
+        TempData["Success"] = "Розцінку додано.";
         return RedirectToAction(nameof(Index), new { edit = true });
     }
 
@@ -78,11 +78,11 @@ public class RatesController : WorkspaceBaseController
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "Проверьте норму времени и ставку.";
+            TempData["Error"] = "Перевірте норму часу та ставку.";
             return RedirectToAction(nameof(Index), new { page, edit = true });
         }
         await _rate.Change(id, dto);
-        TempData["Success"] = "Расценка изменена — прежняя версия сохранена в истории.";
+        TempData["Success"] = "Розцінку змінено — попередню версію збережено в історії.";
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 
@@ -91,7 +91,7 @@ public class RatesController : WorkspaceBaseController
     public async Task<IActionResult> Delete(int id, int page = 1)
     {
         await _rate.Delete(id);
-        TempData["Success"] = "Расценка удалена.";
+        TempData["Success"] = "Розцінку видалено.";
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 }

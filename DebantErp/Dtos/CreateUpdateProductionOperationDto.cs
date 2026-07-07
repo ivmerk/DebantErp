@@ -4,7 +4,7 @@ namespace DebantErp.Dtos
 {
     public class CreateUpdateProductionOperationDto
     {
-        [Required(ErrorMessage = "Название обязательно")]
+        [Required(ErrorMessage = "Назва обов'язкова")]
         public string Name { get; set; } = null!;
     }
 }

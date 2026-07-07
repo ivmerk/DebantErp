@@ -2,25 +2,25 @@
 @model ProductionOperationListViewModel
 
 @{
-    ViewData["Title"] = "Производственные операции";
+    ViewData["Title"] = "Виробничі операції";
 }
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-controller="Workspace" asp-action="Index">Данные</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Операции</li>
+        <li class="breadcrumb-item"><a asp-controller="Workspace" asp-action="Index">Дані</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Операції</li>
     </ol>
 </nav>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="mb-0">Производственные операции</h1>
+    <h1 class="mb-0">Виробничі операції</h1>
     @if (Model.Edit)
     {
         <a class="btn btn-outline-secondary" asp-action="Index" asp-route-page="@Model.Page">Готово</a>
     }
     else
     {
-        <a class="btn btn-primary" asp-action="Index" asp-route-page="@Model.Page" asp-route-edit="true">Изменить</a>
+        <a class="btn btn-primary" asp-action="Index" asp-route-page="@Model.Page" asp-route-edit="true">Змінити</a>
     }
 </div>
 
@@ -43,24 +43,24 @@
 {
     <form asp-controller="ProductionOperations" asp-action="Create" method="post" class="row g-2 mb-4">
         <div class="col-auto">
-            <input name="Name" class="form-control" placeholder="Новая операция" required maxlength="50" />
+            <input name="Name" class="form-control" placeholder="Нова операція" required maxlength="50" />
         </div>
         <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Добавить</button>
+            <button type="submit" class="btn btn-primary">Додати</button>
         </div>
     </form>
 }
 
 @if (Model.Items.Count == 0)
 {
-    <p class="text-muted">Операций пока нет.</p>
+    <p class="text-muted">Операцій поки немає.</p>
 }
 else
 {
     <table class="table table-striped align-middle">
         <thead>
             <tr>
-                <th>Название</th>
+                <th>Назва</th>
                 @if (Model.Edit)
                 {
                     <th style="width:200px"></th>
@@ -78,14 +78,14 @@ else
                                   asp-route-page="@Model.Page" method="post" class="d-flex gap-2">
                                 <input name="Name" value="@o.Name" class="form-control form-control-sm"
                                        required maxlength="50" />
-                                <button type="submit" class="btn btn-sm btn-outline-primary">Сохранить</button>
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Зберегти</button>
                             </form>
                         </td>
                         <td>
                             <form asp-controller="ProductionOperations" asp-action="Delete" asp-route-id="@o.Id"
                                   asp-route-page="@Model.Page" method="post"
-                                  onsubmit="return confirm('Удалить операцию «@o.Name»?');">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                                  onsubmit="return confirm('Видалити операцію «@o.Name»?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Видалити</button>
                             </form>
                         </td>
                     }
@@ -100,7 +100,7 @@ else
 
     @if (Model.TotalPages > 1)
     {
-        <nav aria-label="Пагинация">
+        <nav aria-label="Пагінація">
             <ul class="pagination">
                 <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
                     <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-edit="@Model.Edit">Назад</a>
@@ -112,7 +112,7 @@ else
                     </li>
                 }
                 <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-edit="@Model.Edit">Вперёд</a>
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-edit="@Model.Edit">Вперед</a>
                 </li>
             </ul>
         </nav>

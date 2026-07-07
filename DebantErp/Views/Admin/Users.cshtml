@@ -3,18 +3,18 @@
 @model List<UserRdo>
 
 @{
-    ViewData["Title"] = "Администрирование — пользователи";
+    ViewData["Title"] = "Адміністрування — користувачі";
 }
 
-<h1 class="mb-4">Пользователи</h1>
+<h1 class="mb-4">Користувачі</h1>
 
 <table class="table table-striped align-middle">
     <thead>
         <tr>
             <th>ID</th>
             <th>Email</th>
-            <th>Имя</th>
-            <th>Роль и статус</th>
+            <th>Ім'я</th>
+            <th>Роль і статус</th>
         </tr>
     </thead>
     <tbody>
@@ -39,7 +39,7 @@
                                 <option value="@((int)s)" selected="@(u.Status == s)">@s</option>
                             }
                         </select>
-                        <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
+                        <button type="submit" class="btn btn-sm btn-primary">Зберегти</button>
                     </form>
                 </td>
             </tr>

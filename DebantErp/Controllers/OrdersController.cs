@@ -47,17 +47,17 @@ public class OrdersController : WorkspaceBaseController
     {
         if (string.IsNullOrWhiteSpace(dto.Number))
         {
-            TempData["Error"] = "Укажите номер заказа.";
+            TempData["Error"] = "Вкажіть номер замовлення.";
             return RedirectToAction(nameof(Index), new { edit = true });
         }
         try
         {
             await _order.Create(dto);
-            TempData["Success"] = $"Заказ «{dto.Number}» создан.";
+            TempData["Success"] = $"Замовлення «{dto.Number}» створено.";
         }
         catch (Exception)
         {
-            TempData["Error"] = $"Заказ «{dto.Number}» уже существует.";
+            TempData["Error"] = $"Замовлення «{dto.Number}» вже існує.";
         }
         return RedirectToAction(nameof(Index), new { edit = true });
     }
@@ -68,17 +68,17 @@ public class OrdersController : WorkspaceBaseController
     {
         if ((await _order.Get(id)).Id == 0)
         {
-            TempData["Error"] = "Заказ не найден.";
+            TempData["Error"] = "Замовлення не знайдено.";
             return RedirectToAction(nameof(Index), new { page, edit = true });
         }
         try
         {
             await _order.Update(id, dto);
-            TempData["Success"] = "Заказ обновлён.";
+            TempData["Success"] = "Замовлення оновлено.";
         }
         catch (Exception)
         {
-            TempData["Error"] = $"Заказ «{dto.Number}» уже существует.";
+            TempData["Error"] = $"Замовлення «{dto.Number}» вже існує.";
         }
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
@@ -89,11 +89,11 @@ public class OrdersController : WorkspaceBaseController
     {
         if ((await _order.Get(id)).Id == 0)
         {
-            TempData["Error"] = "Заказ не найден.";
+            TempData["Error"] = "Замовлення не знайдено.";
             return RedirectToAction(nameof(Index), new { page, edit = true });
         }
         await _order.Delete(id);
-        TempData["Success"] = "Заказ удалён.";
+        TempData["Success"] = "Замовлення видалено.";
         return RedirectToAction(nameof(Index), new { page, edit = true });
     }
 
@@ -105,7 +105,7 @@ public class OrdersController : WorkspaceBaseController
         var order = await _order.Get(id);
         if (order.Id == 0)
         {
-            TempData["Error"] = "Заказ не найден.";
+            TempData["Error"] = "Замовлення не знайдено.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -154,7 +154,7 @@ public class OrdersController : WorkspaceBaseController
     {
         if (employeeId <= 0 || productionRateId <= 0 || quantity <= 0)
         {
-            TempData["Error"] = "Выберите работника, расценку и укажите количество.";
+            TempData["Error"] = "Оберіть працівника, розцінку та вкажіть кількість.";
             return RedirectToAction(nameof(Details), new { id, edit = true });
         }
         await _laborCost.Create(new CreateOrderLaborCostDto
@@ -164,7 +164,7 @@ public class OrdersController : WorkspaceBaseController
             ProductionRateId = productionRateId,
             Quantity = quantity,
         });
-        TempData["Success"] = "Трудозатрата добавлена.";
+        TempData["Success"] = "Трудовитрату додано.";
         return RedirectToAction(nameof(Details), new { id, edit = true });
     }
 
@@ -174,16 +174,16 @@ public class OrdersController : WorkspaceBaseController
     {
         if (quantity <= 0)
         {
-            TempData["Error"] = "Количество должно быть больше нуля.";
+            TempData["Error"] = "Кількість має бути більшою за нуль.";
             return RedirectToAction(nameof(Details), new { id, edit = true });
         }
         if ((await _laborCost.Get(costId)).OrderId != id)
         {
-            TempData["Error"] = "Трудозатрата не относится к этому заказу.";
+            TempData["Error"] = "Трудовитрата не належить цьому замовленню.";
             return RedirectToAction(nameof(Details), new { id, edit = true });
         }
         await _laborCost.Update(costId, new UpdateOrderLaborCostDto { Quantity = quantity });
-        TempData["Success"] = "Количество обновлено.";
+        TempData["Success"] = "Кількість оновлено.";
         return RedirectToAction(nameof(Details), new { id, edit = true });
     }
 
@@ -193,11 +193,11 @@ public class OrdersController : WorkspaceBaseController
     {
         if ((await _laborCost.Get(costId)).OrderId != id)
         {
-            TempData["Error"] = "Трудозатрата не относится к этому заказу.";
+            TempData["Error"] = "Трудовитрата не належить цьому замовленню.";
             return RedirectToAction(nameof(Details), new { id, edit = true });
         }
         await _laborCost.Delete(costId);
-        TempData["Success"] = "Трудозатрата удалена.";
+        TempData["Success"] = "Трудовитрату видалено.";
         return RedirectToAction(nameof(Details), new { id, edit = true });
     }
 }

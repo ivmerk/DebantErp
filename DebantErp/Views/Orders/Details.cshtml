@@ -2,26 +2,26 @@
 @model OrderDetailsViewModel
 
 @{
-    ViewData["Title"] = $"Заказ {Model.Order.Number}";
+    ViewData["Title"] = $"Замовлення {Model.Order.Number}";
 }
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-controller="Workspace" asp-action="Index">Данные</a></li>
-        <li class="breadcrumb-item"><a asp-controller="Orders" asp-action="Index">Заказы</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Workspace" asp-action="Index">Дані</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Orders" asp-action="Index">Замовлення</a></li>
         <li class="breadcrumb-item active" aria-current="page">@Model.Order.Number</li>
     </ol>
 </nav>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="mb-0">Заказ @Model.Order.Number</h1>
+    <h1 class="mb-0">Замовлення @Model.Order.Number</h1>
     @if (Model.Edit)
     {
         <a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@Model.Order.Id">Готово</a>
     }
     else
     {
-        <a class="btn btn-primary" asp-action="Details" asp-route-id="@Model.Order.Id" asp-route-edit="true">Изменить</a>
+        <a class="btn btn-primary" asp-action="Details" asp-route-id="@Model.Order.Id" asp-route-edit="true">Змінити</a>
     }
 </div>
 
@@ -40,16 +40,16 @@
     </div>
 }
 
-<h5 class="mb-3">Трудозатраты</h5>
+<h5 class="mb-3">Трудовитрати</h5>
 
 @if (Model.Edit)
 {
     <form asp-controller="Orders" asp-action="AddLaborCost" asp-route-id="@Model.Order.Id" method="post"
           class="row g-2 mb-4 align-items-end">
         <div class="col-md-4">
-            <label class="form-label mb-0">Работник</label>
+            <label class="form-label mb-0">Працівник</label>
             <select name="employeeId" class="form-select" required>
-                <option value="" disabled selected>Работник…</option>
+                <option value="" disabled selected>Працівник…</option>
                 @foreach (var e in Model.Employees)
                 {
                     <option value="@e.Id">@e.LastName @e.FirstName</option>
@@ -57,9 +57,9 @@
             </select>
         </div>
         <div class="col-md-4">
-            <label class="form-label mb-0">Расценка (операция · ставка)</label>
+            <label class="form-label mb-0">Розцінка (операція · ставка)</label>
             <select name="productionRateId" class="form-select" required>
-                <option value="" disabled selected>Расценка…</option>
+                <option value="" disabled selected>Розцінка…</option>
                 @foreach (var r in Model.Rates)
                 {
                     <option value="@r.Id">@r.OperationName · @r.Rate</option>
@@ -67,29 +67,29 @@
             </select>
         </div>
         <div class="col-md-2">
-            <label class="form-label mb-0">Кол-во</label>
+            <label class="form-label mb-0">К-сть</label>
             <input name="quantity" type="number" min="1" step="1" class="form-control" required />
         </div>
         <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">Добавить</button>
+            <button type="submit" class="btn btn-primary w-100">Додати</button>
         </div>
     </form>
 }
 
 @if (Model.Costs.Count == 0)
 {
-    <p class="text-muted">Трудозатрат пока нет.</p>
+    <p class="text-muted">Трудовитрат поки немає.</p>
 }
 else
 {
     <table class="table table-striped align-middle">
         <thead>
             <tr>
-                <th>Работник</th>
-                <th>Операция</th>
+                <th>Працівник</th>
+                <th>Операція</th>
                 <th style="width:120px">Ставка</th>
-                <th style="width:160px">Кол-во</th>
-                <th style="width:120px">Сумма</th>
+                <th style="width:160px">К-сть</th>
+                <th style="width:120px">Сума</th>
                 @if (Model.Edit)
                 {
                     <th style="width:120px"></th>
@@ -124,8 +124,8 @@ else
                         <td>
                             <form asp-controller="Orders" asp-action="DeleteLaborCost" asp-route-id="@Model.Order.Id"
                                   asp-route-costId="@c.Id" method="post"
-                                  onsubmit="return confirm('Удалить трудозатрату?');">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                                  onsubmit="return confirm('Видалити трудовитрату?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Видалити</button>
                             </form>
                         </td>
                     }
@@ -134,7 +134,7 @@ else
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="4" class="text-end">Итого:</th>
+                <th colspan="4" class="text-end">Разом:</th>
                 <th>@Model.Total</th>
                 @if (Model.Edit)
                 {
