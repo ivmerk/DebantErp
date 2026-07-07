@@ -19,24 +19,24 @@ namespace DebantErp.BL.ProductionRate
         public async Task<List<ProductionRateRdo>> GetRates()
         {
             var rates = await _rateDAL.Get(); // действующие (is_actual = true)
-            var names = await OperationNames();
-            return rates.Select(r => Map(r, names)).ToList();
+            var ops = await Operations();
+            return rates.Select(r => Map(r, ops)).ToList();
         }
 
         public async Task<ProductionRateRdo> GetRate(int id)
         {
             var rate = await _rateDAL.Get(id);
-            var names = await OperationNames();
-            return Map(rate, names);
+            var ops = await Operations();
+            return Map(rate, ops);
         }
 
         public async Task<List<ProductionRateRdo>> GetHistory(int operationId)
         {
             var all = await _rateDAL.GetByProductionOperationId(operationId);
-            var names = await OperationNames();
+            var ops = await Operations();
             return all
                 .OrderByDescending(r => r.CreatedAt)
-                .Select(r => Map(r, names))
+                .Select(r => Map(r, ops))
                 .ToList();
         }
 
@@ -80,22 +80,22 @@ namespace DebantErp.BL.ProductionRate
 
         public Task<int> Delete(int id) => _rateDAL.Delete(id);
 
-        private async Task<Dictionary<int, string>> OperationNames()
+        private async Task<Dictionary<int, ProductionOperationModel>> Operations()
         {
             var ops = await _operationDAL.Get();
-            return ops.ToDictionary(o => o.Id, o => o.Name);
+            return ops.ToDictionary(o => o.Id);
         }
 
-        private static ProductionRateRdo Map(ProductionRateModel r, Dictionary<int, string> names)
+        private static ProductionRateRdo Map(ProductionRateModel r, Dictionary<int, ProductionOperationModel> ops)
         {
             var opId = r.ProductionOperationId;
+            var op = opId.HasValue && ops.TryGetValue(opId.Value, out var o) ? o : null;
             return new ProductionRateRdo
             {
                 Id = r.Id,
                 ProductionOperationId = opId,
-                OperationName = opId.HasValue && names.TryGetValue(opId.Value, out var n)
-                    ? n
-                    : $"#{opId}",
+                OperationName = op?.Name ?? $"#{opId}",
+                OperationCode = op?.Code ?? "",
                 OperationTimeframe = r.OperationTimeframe,
                 Rate = r.Rate,
                 IsActual = r.IsActual,

@@ -54,7 +54,7 @@
                     <option value="" disabled selected>Операція…</option>
                     @foreach (var op in Model.AvailableOperations)
                     {
-                        <option value="@op.Id">@op.Name</option>
+                        <option value="@op.Id">@op.Code — @op.Name</option>
                     }
                 </select>
             </div>
@@ -82,7 +82,8 @@ else
     <table class="table table-striped align-middle">
         <thead>
             <tr>
-                <th>Операція</th>
+                <th style="width:140px">Код</th>
+                <th>Найменування</th>
                 <th style="width:160px">Норма часу</th>
                 <th style="width:160px">Ставка</th>
                 <th style="width:320px"></th>
@@ -95,6 +96,7 @@ else
                 <tr>
                     @if (Model.Edit)
                     {
+                        <td>@r.OperationCode</td>
                         <td>@r.OperationName</td>
                         <td colspan="2">
                             <form asp-controller="Rates" asp-action="Change" asp-route-id="@r.Id"
@@ -126,6 +128,7 @@ else
                     }
                     else
                     {
+                        <td>@r.OperationCode</td>
                         <td>@r.OperationName</td>
                         <td>@r.OperationTimeframe.ToString("0.00")</td>
                         <td>@r.Rate</td>
@@ -139,7 +142,7 @@ else
                 @if (row.History.Count > 0)
                 {
                     <tr class="collapse" id="hist-@r.Id">
-                        <td colspan="4" class="bg-light">
+                        <td colspan="5" class="bg-light">
                             <div class="small text-muted mb-1">Попередні версії:</div>
                             <ul class="list-unstyled mb-0">
                                 @foreach (var h in row.History)

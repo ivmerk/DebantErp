@@ -5,6 +5,7 @@ namespace DebantErp.Rdos
         public int Id { get; set; }
         public int? ProductionOperationId { get; set; }
         public string OperationName { get; set; } = "";
+        public string OperationCode { get; set; } = "";
         public decimal OperationTimeframe { get; set; }
         public decimal Rate { get; set; }
         public bool IsActual { get; set; }
