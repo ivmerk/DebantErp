@@ -55,31 +55,34 @@ DAL зарегистрирован как `IProductionOperationDAL`, BL — `IPr
 
 ## Модель данных
 
-`Db/004_create_productuion_rates.sql`:
+`Db/001_baseline.sql` (таблицы `production_operations`, `production_rates`):
 
 ```sql
 create table if not exists production_operations (
   id serial primary key,
   name varchar(50) not null,
   is_actual boolean default true,
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  code varchar(15) not null,
+  constraint uq_production_operations_code unique (code)
 );
 
 create table if not exists production_rates (
   id serial primary key,
   production_operation_id int references production_operations(id) on delete cascade,
   is_actual boolean default true,
-  operation_timeframe numeric not null,
+  operation_timeframe numeric(12, 2) not null,
   rate numeric not null,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
 ```
 
-- **Операция** — справочник наименований работ (`name`), мягко деактивируется
+- **Операция** — справочник наименований работ (`name`) с уникальным кодом
+  (`code`, до 15 символов); мягко деактивируется через `is_actual`.
+- **Расценка** привязана к операции, хранит норму времени (`operation_timeframe`,
+  дробное положительное с двумя знаками) и ставку (`rate`); мягко деактивируется
   через `is_actual`.
-- **Расценка** привязана к операции, хранит норму времени (`operation_timeframe`)
-  и ставку (`rate`); мягко деактивируется через `is_actual`.
 
 Сидируется `MockDataSeeder` при старте (если таблицы пусты).
 

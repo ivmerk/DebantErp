@@ -41,17 +41,24 @@ cd DebantErp && dotnet run            # http://localhost:5010
 
 ## База данных
 
-Схема создаётся **вручную** скриптами `Db/001_*.sql` … `Db/008_*.sql` по порядку
-(раннера миграций нет). Данные засеваются `MockDataSeeder` при старте, если
-таблицы пусты. О пересоздании схемы и заметке про опечатку `speciality` см.
+Вся схема лежит в одном скрипте `Db/001_baseline.sql` (консолидация прежних
+`001`–`012`). Локально его нужно применить **вручную**; на деплое это делает
+сервис `migrator` (`scripts/migrate.sh`, идемпотентно, с учётом в таблице
+`_migrations`). Схема идемпотентна (`create … if not exists`). Данные засеваются
+`MockDataSeeder` при старте, если таблицы пусты. О заметке про опечатку
+`speciality` см.
 [employees-specialties.md → База данных](employees-specialties.md#база-данных).
 
-| Скрипт | Таблицы |
-|--------|---------|
-| `001_create_users.sql` | `users` (+ триггер `updated_at`) |
-| `002_create_employees.sql` | `employees`, `employees_details` |
-| `003_create_specialties.sql` | `specialties`, `employee_specialty_assignments` |
-| `004_create_productuion_rates.sql` | `production_operations`, `production_rates` |
-| `005_create_orders.sql` | `orders` |
-| `006_create_order_labor_costs.sql` | `order_labor_costs` |
-| `007` / `008` | `auth_sessions` создаётся и затем удаляется (сессии не используются) |
+Таблицы, создаваемые `001_baseline.sql`:
+
+| Таблица | Назначение |
+|---------|-----------|
+| `users` (+ триггер `updated_at`) | пользователи, вход, роли |
+| `employees`, `employees_details` | работники и их реквизиты |
+| `specialties`, `employee_specialty_assignments` | специальности и назначения |
+| `production_operations`, `production_rates` | операции (с кодом) и расценки (с историей версий) |
+| `orders` | заказы |
+| `order_labor_costs` | трудозатраты по заказам |
+
+> Таблица `auth_sessions` (прежние `007`/`008`) в итоговой схеме отсутствует —
+> сессии заменены cookie-аутентификацией, поэтому в baseline её нет.

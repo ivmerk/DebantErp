@@ -37,7 +37,7 @@
 
 ## Модель данных
 
-`Db/005_create_orders.sql`:
+`Db/001_baseline.sql` (таблицы `orders`, `order_labor_costs`):
 
 ```sql
 create table if not exists orders (
@@ -47,11 +47,7 @@ create table if not exists orders (
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
-```
 
-`Db/006_create_order_labor_costs.sql`:
-
-```sql
 create table if not exists order_labor_costs (
   id serial primary key,
   employee_id int not null references employees(id),
@@ -62,6 +58,12 @@ create table if not exists order_labor_costs (
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+-- частичные индексы (только is_deleted = false)
+create index if not exists idx_order_labor_costs_order_id
+  on order_labor_costs (order_id) where is_deleted = false;
+create index if not exists idx_order_labor_costs_employee_id
+  on order_labor_costs (employee_id) where is_deleted = false;
 ```
 
 Трудозатрата связывает **заказ**, **работника** и **расценку**

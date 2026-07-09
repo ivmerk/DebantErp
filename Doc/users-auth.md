@@ -5,7 +5,7 @@
 
 ## Сущность «Пользователь»
 
-`Db/001_create_users.sql`:
+`Db/001_baseline.sql` (таблица `users`):
 
 ```sql
 create table if not exists users (

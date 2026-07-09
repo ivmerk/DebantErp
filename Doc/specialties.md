@@ -37,7 +37,7 @@
 
 ## Модель данных
 
-`Db/003_create_specialties.sql`:
+`Db/001_baseline.sql` (таблицы `specialties`, `employee_specialty_assignments`):
 
 ```sql
 create table if not exists specialties (

@@ -91,15 +91,12 @@ docker-compose -f docker-compose.dev.yml up -d
 
 2. **Run migrations** (located in `DebantErp/Db/`):
 ```bash
-# Execute SQL files in order:
-001_create_users.sql
-002_create_employees.sql
-003_create_specialties.sql
-004_create_productuion_rates.sql
-005_create_orders.sql
-006_create_order_labor_costs.sql
-007_create_auth_sessions.sql
+# The whole schema is a single consolidated baseline; apply it manually:
+001_baseline.sql
 ```
+On deploy the `migrator` service (`scripts/migrate.sh`) applies any unapplied
+`Db/*.sql` once, tracked in a `_migrations` table. Migrations are append-only —
+new schema changes go in new `NNN_*.sql` files, not by editing the baseline.
 
 ### Run Application
 
