@@ -27,6 +27,8 @@ pgAdmin is available at `http://localhost:8083` (email: `ivan.e.merkulov@gmail.c
 
 **SQL migrations** live in `Db/NNN_*.sql` and apply in numeric order. Locally they must be run manually against the database (there is no dev runner). On deploy the `migrator` service (`Dockerfile.migrator` + `scripts/migrate.sh`) applies each unapplied file once, tracked in a `_migrations` table.
 
+`001_baseline.sql` is a consolidated baseline — the squash of the former `001`–`012` into one idempotent (`create … if not exists`) file that reproduces the full schema. On already-provisioned DBs it is a no-op (schema already matches; the old `001`–`012` rows stay in `_migrations` harmlessly); fresh installs get the whole schema from this one file. This one-time squash was the sanctioned exception to the append-only rule below — don't re-squash without agreement.
+
 **Migrations are append-only — never edit a file that may already be applied** (unless a note here says otherwise). Because the runner skips files recorded in `_migrations`, editing an applied migration silently diverges environments that already ran the old version (schema drift). Any schema change goes in a *new* forward `NNN_*.sql` file, written idempotently (`add column if not exists`, `drop index if exists` + recreate, etc.).
 
 ## Architecture
