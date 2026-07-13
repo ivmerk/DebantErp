@@ -21,6 +21,7 @@ namespace DebantErp.MockData
             var orderMock = new MockOrderData(_connectionString);
             var productionOperationMock = new MockProductionOperation(_connectionString);
             var productionRateMock = new MockProductionRate(_connectionString);
+            var gradeMock = new MockGrade(_connectionString);
 
             await userMock.InsertAsync();
             await employeeMock.InsertAsync();
@@ -28,6 +29,7 @@ namespace DebantErp.MockData
             await orderMock.InsertAsync();
             await productionOperationMock.InsertAsync();
             await productionRateMock.InsertAsync();
+            await gradeMock.InsertAsync();
 
             Console.WriteLine("Мок-данные добавлены!");
         }
