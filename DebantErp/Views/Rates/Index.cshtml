@@ -84,6 +84,8 @@ else
             <tr>
                 <th style="width:140px">Код</th>
                 <th>Найменування</th>
+                <th style="width:150px">Денна ставка</th>
+                <th style="width:160px">Оклад (21 р.д.)</th>
                 <th style="width:160px">Норма часу</th>
                 <th style="width:160px">Ставка</th>
                 <th style="width:320px"></th>
@@ -97,7 +99,9 @@ else
                     @if (Model.Edit)
                     {
                         <td>@r.OperationCode</td>
-                        <td>@r.OperationName</td>
+                        <td>@r.OperationName@(r.OperationGrade.HasValue ? $" (розряд {r.OperationGrade})" : "")</td>
+                        <td>@(r.GradeDailyRate?.ToString("0.00") ?? "—")</td>
+                        <td>@(r.GradeMonthlySalary?.ToString("0.00") ?? "—")</td>
                         <td colspan="2">
                             <form asp-controller="Rates" asp-action="Change" asp-route-id="@r.Id"
                                   asp-route-page="@Model.Page" method="post" class="row g-2">
@@ -129,7 +133,9 @@ else
                     else
                     {
                         <td>@r.OperationCode</td>
-                        <td>@r.OperationName</td>
+                        <td>@r.OperationName@(r.OperationGrade.HasValue ? $" (розряд {r.OperationGrade})" : "")</td>
+                        <td>@(r.GradeDailyRate?.ToString("0.00") ?? "—")</td>
+                        <td>@(r.GradeMonthlySalary?.ToString("0.00") ?? "—")</td>
                         <td>@r.OperationTimeframe.ToString("0.00")</td>
                         <td>@r.Rate</td>
                         <td>
@@ -142,7 +148,7 @@ else
                 @if (row.History.Count > 0)
                 {
                     <tr class="collapse" id="hist-@r.Id">
-                        <td colspan="5" class="bg-light">
+                        <td colspan="7" class="bg-light">
                             <div class="small text-muted mb-1">Попередні версії:</div>
                             <ul class="list-unstyled mb-0">
                                 @foreach (var h in row.History)

@@ -9,34 +9,39 @@ namespace DebantErp.BL.ProductionRate
     {
         private readonly IProductionRateDAL _rateDAL;
         private readonly IProductionOperationDAL _operationDAL;
+        private readonly IGradeDAL _gradeDAL;
 
-        public ProductionRate(IProductionRateDAL rateDAL, IProductionOperationDAL operationDAL)
+        public ProductionRate(IProductionRateDAL rateDAL, IProductionOperationDAL operationDAL, IGradeDAL gradeDAL)
         {
             _rateDAL = rateDAL;
             _operationDAL = operationDAL;
+            _gradeDAL = gradeDAL;
         }
 
         public async Task<List<ProductionRateRdo>> GetRates()
         {
             var rates = await _rateDAL.Get(); // действующие (is_actual = true)
             var ops = await Operations();
-            return rates.Select(r => Map(r, ops)).ToList();
+            var grades = await Grades();
+            return rates.Select(r => Map(r, ops, grades)).ToList();
         }
 
         public async Task<ProductionRateRdo> GetRate(int id)
         {
             var rate = await _rateDAL.Get(id);
             var ops = await Operations();
-            return Map(rate, ops);
+            var grades = await Grades();
+            return Map(rate, ops, grades);
         }
 
         public async Task<List<ProductionRateRdo>> GetHistory(int operationId)
         {
             var all = await _rateDAL.GetByProductionOperationId(operationId);
             var ops = await Operations();
+            var grades = await Grades();
             return all
                 .OrderByDescending(r => r.CreatedAt)
-                .Select(r => Map(r, ops))
+                .Select(r => Map(r, ops, grades))
                 .ToList();
         }
 
@@ -86,16 +91,32 @@ namespace DebantErp.BL.ProductionRate
             return ops.ToDictionary(o => o.Id);
         }
 
-        private static ProductionRateRdo Map(ProductionRateModel r, Dictionary<int, ProductionOperationModel> ops)
+        // Действующая дневная ставка по номеру разряда.
+        private async Task<Dictionary<int, decimal>> Grades()
+        {
+            var grades = await _gradeDAL.Get(); // действующие (is_actual = true)
+            return grades
+                .GroupBy(g => g.Grade)
+                .ToDictionary(g => g.Key, g => g.First().DailyRate);
+        }
+
+        private static ProductionRateRdo Map(
+            ProductionRateModel r,
+            Dictionary<int, ProductionOperationModel> ops,
+            Dictionary<int, decimal> grades)
         {
             var opId = r.ProductionOperationId;
             var op = opId.HasValue && ops.TryGetValue(opId.Value, out var o) ? o : null;
+            decimal? gradeDailyRate =
+                op?.Grade is int grade && grades.TryGetValue(grade, out var rate) ? rate : null;
             return new ProductionRateRdo
             {
                 Id = r.Id,
                 ProductionOperationId = opId,
                 OperationName = op?.Name ?? $"#{opId}",
                 OperationCode = op?.Code ?? "",
+                OperationGrade = op?.Grade,
+                GradeDailyRate = gradeDailyRate,
                 OperationTimeframe = r.OperationTimeframe,
                 Rate = r.Rate,
                 IsActual = r.IsActual,

@@ -3,6 +3,12 @@
 
 @{
     ViewData["Title"] = "Розряди";
+
+    // Формат грошей з розбивкою на розряди: пробіл між тисячами, кома — десяткові.
+    var money = (System.Globalization.CultureInfo)System.Globalization.CultureInfo.InvariantCulture.Clone();
+    money.NumberFormat.NumberGroupSeparator = " ";
+    money.NumberFormat.NumberDecimalSeparator = ",";
+    Func<decimal, string> Money = v => v.ToString("N2", money);
 }
 
 <nav aria-label="breadcrumb">
@@ -92,7 +98,7 @@ else
                                            min="0" step="0.01" class="form-control form-control-sm" required />
                                 </div>
                                 <div class="col-auto text-muted small" style="min-width:150px">
-                                    оклад: <strong>@g.MonthlySalary.ToString("0.00")</strong>
+                                    оклад: <strong>@Money(g.MonthlySalary)</strong>
                                 </div>
                                 <div class="col">
                                     <input name="EffectiveDate" value="@g.EffectiveDate.ToString("yyyy-MM-dd")"
@@ -117,8 +123,8 @@ else
                     else
                     {
                         <td>@g.Grade</td>
-                        <td>@g.DailyRate</td>
-                        <td>@g.MonthlySalary.ToString("0.00")</td>
+                        <td>@Money(g.DailyRate)</td>
+                        <td>@Money(g.MonthlySalary)</td>
                         <td>@g.EffectiveDate.ToString("yyyy-MM-dd")</td>
                         <td>
                             <button type="button" class="btn btn-sm btn-outline-secondary"
@@ -135,7 +141,7 @@ else
                             <ul class="list-unstyled mb-0">
                                 @foreach (var h in row.History)
                                 {
-                                    <li>ставка <strong>@h.DailyRate</strong>, оклад <strong>@h.MonthlySalary.ToString("0.00")</strong>, з <strong>@h.EffectiveDate.ToString("yyyy-MM-dd")</strong>
+                                    <li>ставка <strong>@Money(h.DailyRate)</strong>, оклад <strong>@Money(h.MonthlySalary)</strong>, з <strong>@h.EffectiveDate.ToString("yyyy-MM-dd")</strong>
                                         <span class="text-muted">— до @h.CreatedAt.ToString("yyyy-MM-dd")</span></li>
                                 }
                             </ul>

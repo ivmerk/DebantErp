@@ -22,19 +22,20 @@ public class MockProductionOperation
         if (operationCount > 0)
             return;
 
+        // Разряд у каждой операции ссылается на номер разряда из таблицы grades (1..6).
         var operations = new List<object>
         {
-            new { Name = "Порізка дна", Code = "CUT-BOTTOM" },
-            new { Name = "Порізка петлі", Code = "CUT-LOOP" },
-            new { Name = "Порізка манжети", Code = "CUT-CUFF" },
-            new { Name = "Друк тіла", Code = "PRINT-BODY" },
+            new { Name = "Порізка дна", Code = "CUT-BOTTOM", Grade = 1 },
+            new { Name = "Порізка петлі", Code = "CUT-LOOP", Grade = 2 },
+            new { Name = "Порізка манжети", Code = "CUT-CUFF", Grade = 3 },
+            new { Name = "Друк тіла", Code = "PRINT-BODY", Grade = 4 },
         };
         try
         {
             foreach (var operation in operations)
             {
                 string insertOperationSql =
-                    @"INSERT INTO production_operations (name, code) VALUES (@Name, @Code)";
+                    @"INSERT INTO production_operations (name, code, grade) VALUES (@Name, @Code, @Grade)";
                 await connection.ExecuteAsync(insertOperationSql, operation);
             }
         }
