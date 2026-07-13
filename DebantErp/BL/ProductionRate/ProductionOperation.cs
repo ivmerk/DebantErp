@@ -18,14 +18,14 @@ namespace DebantErp.BL.ProductionRate
         {
             var operations = await _operationDAL.Get();
             return operations
-                .Select(o => new ProductionOperationRdo { Id = o.Id, Name = o.Name, Code = o.Code })
+                .Select(o => new ProductionOperationRdo { Id = o.Id, Name = o.Name, Code = o.Code, Grade = o.Grade })
                 .ToList();
         }
 
         public async Task<ProductionOperationRdo> GetOperation(int id)
         {
             var operation = await _operationDAL.Get(id);
-            return new ProductionOperationRdo { Id = operation.Id, Name = operation.Name, Code = operation.Code };
+            return new ProductionOperationRdo { Id = operation.Id, Name = operation.Name, Code = operation.Code, Grade = operation.Grade };
         }
 
         // Нормализация наименования: первая буква заглавная, остальные строчные,
@@ -44,7 +44,7 @@ namespace DebantErp.BL.ProductionRate
             {
                 throw new Exception("Operation code already exist");
             }
-            var model = new ProductionOperationModel { Name = Capitalize(dto.Name), Code = code };
+            var model = new ProductionOperationModel { Name = Capitalize(dto.Name), Code = code, Grade = dto.Grade };
             return await _operationDAL.Create(model);
         }
 
@@ -63,6 +63,7 @@ namespace DebantErp.BL.ProductionRate
             }
             operation.Name = Capitalize(dto.Name);
             operation.Code = code;
+            operation.Grade = dto.Grade;
             return await _operationDAL.Update(operation);
         }
 

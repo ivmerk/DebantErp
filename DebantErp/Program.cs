@@ -40,6 +40,7 @@ try
   builder.Services.AddSingleton<IOrderLaborCostDAL, OrderLaborCostDAL>();
   builder.Services.AddSingleton<IProductionOperationDAL, ProductionOperationDAL>();
   builder.Services.AddSingleton<IProductionRateDAL, ProductionRateDAL>();
+  builder.Services.AddSingleton<IGradeDAL, GradeDAL>();
 
   builder.Services.AddSingleton<IEncrypt, Encrypt>();
   builder.Services.AddScoped<IAuth, Auth>();
@@ -52,6 +53,7 @@ try
   builder.Services.AddScoped<DebantErp.BL.OrderLaborCost.IOrderLaborCost, DebantErp.BL.OrderLaborCost.OrderLostCost>();
   builder.Services.AddScoped<DebantErp.BL.ProductionRate.IProductionOperation, DebantErp.BL.ProductionRate.ProductionOperation>();
   builder.Services.AddScoped<DebantErp.BL.ProductionRate.IProductionRate, DebantErp.BL.ProductionRate.ProductionRate>();
+  builder.Services.AddScoped<DebantErp.BL.Grade.IGrade, DebantErp.BL.Grade.Grade>();
 
   // Serilog: конфиг читается из appsettings (секция "Serilog") — уровни, sinks
   // (Console + rolling File в /app/.logs, примонтированный том) можно менять без пересборки.

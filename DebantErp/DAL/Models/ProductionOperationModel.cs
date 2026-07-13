@@ -10,6 +10,8 @@ namespace DebantErp.DAL.Models
 
         public bool IsActual { get; set; } = true;
 
+        public int? Grade { get; set; }   // разряд операции
+
         public DateTime CreatedAt { get; set; }
     }
 }

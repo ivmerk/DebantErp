@@ -24,7 +24,7 @@ namespace DebantErp.DAL
 
         public async Task<int> Create(ProductionOperationModel model)
         {
-            string sql = "INSERT INTO production_operations ( name, code ) VALUES (@name, @code) RETURNING id";
+            string sql = "INSERT INTO production_operations ( name, code, grade ) VALUES (@name, @code, @grade) RETURNING id";
             return await DbHelper.ExecuteScalarAsync<int>(sql, model);
         }
         public async Task<bool> IsExist(int id)
@@ -49,7 +49,7 @@ namespace DebantErp.DAL
 
         public async Task<int> Update(ProductionOperationModel model)
         {
-            string sql = "UPDATE production_operations SET name = @name, code = @code WHERE id = @id";
+            string sql = "UPDATE production_operations SET name = @name, code = @code, grade = @grade WHERE id = @id";
             return await DbHelper.ExecuteAsync(sql, model);
         }
 
