@@ -215,9 +215,9 @@ public class EmployeesController : WorkspaceBaseController
                     Date = order.CreatedAt,
                     OrderNumber = order.Number ?? $"#{c.OrderId}",
                     OperationName = rate.OperationName,
-                    Rate = rate.Rate,
+                    Rate = rate.CostPerPiece,
                     Quantity = c.Quantity,
-                    Sum = rate.Rate * c.Quantity,
+                    Sum = rate.CostPerPiece * c.Quantity,
                 };
             })
             .OrderByDescending(r => r.Date)

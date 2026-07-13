@@ -57,12 +57,12 @@
             </select>
         </div>
         <div class="col-md-4">
-            <label class="form-label mb-0">Розцінка (операція · ставка)</label>
+            <label class="form-label mb-0">Розцінка (операція · вартість за шт)</label>
             <select name="productionRateId" class="form-select" required>
                 <option value="" disabled selected>Розцінка…</option>
                 @foreach (var r in Model.Rates)
                 {
-                    <option value="@r.Id">@r.OperationName · @r.Rate</option>
+                    <option value="@r.Id">@r.OperationName · @r.CostPerPiece.ToString("0.00")</option>
                 }
             </select>
         </div>

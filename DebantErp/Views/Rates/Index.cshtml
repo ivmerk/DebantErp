@@ -3,6 +3,12 @@
 
 @{
     ViewData["Title"] = "Розцінки";
+
+    // Формат грошей з розбивкою на розряди: пробіл між тисячами, кома — десяткові.
+    var money = (System.Globalization.CultureInfo)System.Globalization.CultureInfo.InvariantCulture.Clone();
+    money.NumberFormat.NumberGroupSeparator = " ";
+    money.NumberFormat.NumberDecimalSeparator = ",";
+    Func<decimal, string> Money = v => v.ToString("N2", money);
 }
 
 <nav aria-label="breadcrumb">
@@ -58,13 +64,9 @@
                     }
                 </select>
             </div>
-            <div class="col-md-3">
-                <label class="form-label mb-0">Норма часу</label>
+            <div class="col-md-4">
+                <label class="form-label mb-0">Хронометраж, сек</label>
                 <input name="OperationTimeframe" type="number" min="0.01" step="0.01" class="form-control" required />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label mb-0">Ставка</label>
-                <input name="Rate" type="number" min="0" step="0.01" class="form-control" required />
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100">Додати</button>
@@ -84,10 +86,8 @@ else
             <tr>
                 <th style="width:140px">Код</th>
                 <th>Найменування</th>
-                <th style="width:150px">Денна ставка</th>
-                <th style="width:160px">Оклад (21 р.д.)</th>
-                <th style="width:160px">Норма часу</th>
-                <th style="width:160px">Ставка</th>
+                <th style="width:170px">Хронометраж, сек</th>
+                <th style="width:190px">Вартість операції за шт</th>
                 <th style="width:320px"></th>
             </tr>
         </thead>
@@ -100,19 +100,16 @@ else
                     {
                         <td>@r.OperationCode</td>
                         <td>@r.OperationName@(r.OperationGrade.HasValue ? $" (розряд {r.OperationGrade})" : "")</td>
-                        <td>@(r.GradeDailyRate?.ToString("0.00") ?? "—")</td>
-                        <td>@(r.GradeMonthlySalary?.ToString("0.00") ?? "—")</td>
                         <td colspan="2">
                             <form asp-controller="Rates" asp-action="Change" asp-route-id="@r.Id"
-                                  asp-route-page="@Model.Page" method="post" class="row g-2">
+                                  asp-route-page="@Model.Page" method="post" class="row g-2 align-items-center">
                                 <div class="col">
                                     <input name="OperationTimeframe"
                                            value="@r.OperationTimeframe.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
                                            type="number" min="0.01" step="0.01" class="form-control form-control-sm" required />
                                 </div>
-                                <div class="col">
-                                    <input name="Rate" value="@r.Rate" type="number"
-                                           min="0" step="0.01" class="form-control form-control-sm" required />
+                                <div class="col-auto text-muted small" style="min-width:130px">
+                                    за шт: <strong>@Money(r.CostPerPiece)</strong>
                                 </div>
                                 <div class="col-auto">
                                     <button type="submit" class="btn btn-sm btn-outline-primary">Зберегти</button>
@@ -134,10 +131,8 @@ else
                     {
                         <td>@r.OperationCode</td>
                         <td>@r.OperationName@(r.OperationGrade.HasValue ? $" (розряд {r.OperationGrade})" : "")</td>
-                        <td>@(r.GradeDailyRate?.ToString("0.00") ?? "—")</td>
-                        <td>@(r.GradeMonthlySalary?.ToString("0.00") ?? "—")</td>
                         <td>@r.OperationTimeframe.ToString("0.00")</td>
-                        <td>@r.Rate</td>
+                        <td>@Money(r.CostPerPiece)</td>
                         <td>
                             <button type="button" class="btn btn-sm btn-outline-secondary"
                                     data-bs-toggle="collapse" data-bs-target="#hist-@r.Id"
@@ -148,12 +143,12 @@ else
                 @if (row.History.Count > 0)
                 {
                     <tr class="collapse" id="hist-@r.Id">
-                        <td colspan="7" class="bg-light">
+                        <td colspan="5" class="bg-light">
                             <div class="small text-muted mb-1">Попередні версії:</div>
                             <ul class="list-unstyled mb-0">
                                 @foreach (var h in row.History)
                                 {
-                                    <li>норма <strong>@h.OperationTimeframe.ToString("0.00")</strong>, ставка <strong>@h.Rate</strong>
+                                    <li>хронометраж <strong>@h.OperationTimeframe.ToString("0.00")</strong> сек, за шт <strong>@Money(h.CostPerPiece)</strong>
                                         <span class="text-muted">— до @h.CreatedAt.ToString("yyyy-MM-dd")</span></li>
                                 }
                             </ul>

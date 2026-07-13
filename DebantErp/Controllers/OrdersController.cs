@@ -131,9 +131,9 @@ public class OrdersController : WorkspaceBaseController
                 Id = c.Id,
                 EmployeeName = empNames.TryGetValue(c.EmployeeId, out var n) ? n : $"#{c.EmployeeId}",
                 OperationName = rate.OperationName,
-                Rate = rate.Rate,
+                Rate = rate.CostPerPiece,
                 Quantity = c.Quantity,
-                Sum = rate.Rate * c.Quantity,
+                Sum = rate.CostPerPiece * c.Quantity,
             };
         }).ToList();
 

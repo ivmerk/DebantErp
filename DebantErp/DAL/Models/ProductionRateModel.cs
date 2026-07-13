@@ -10,8 +10,6 @@ namespace DebantErp.DAL.Models
 
         public decimal OperationTimeframe { get; set; }
 
-        public decimal Rate { get; set; }
-
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }

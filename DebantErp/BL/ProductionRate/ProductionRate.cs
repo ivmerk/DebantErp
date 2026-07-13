@@ -60,7 +60,6 @@ namespace DebantErp.BL.ProductionRate
             {
                 ProductionOperationId = dto.ProductionOperationId,
                 OperationTimeframe = dto.OperationTimeframe,
-                Rate = dto.Rate,
             });
         }
 
@@ -79,7 +78,6 @@ namespace DebantErp.BL.ProductionRate
             {
                 ProductionOperationId = old.ProductionOperationId,
                 OperationTimeframe = dto.OperationTimeframe,
-                Rate = dto.Rate,
             });
         }
 
@@ -118,7 +116,6 @@ namespace DebantErp.BL.ProductionRate
                 OperationGrade = op?.Grade,
                 GradeDailyRate = gradeDailyRate,
                 OperationTimeframe = r.OperationTimeframe,
-                Rate = r.Rate,
                 IsActual = r.IsActual,
                 CreatedAt = r.CreatedAt,
             };

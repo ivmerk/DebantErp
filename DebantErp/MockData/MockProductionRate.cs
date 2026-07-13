@@ -31,14 +31,13 @@ public class MockProductionRate
             foreach (var operation in productionOperations)
             {
                 string insertProductionRateSql =
-                    @"INSERT INTO production_rates (production_operation_id, operation_timeframe, rate) VALUES (@OperationId, @OperationTimeframe, @Rate)";
+                    @"INSERT INTO production_rates (production_operation_id, operation_timeframe) VALUES (@OperationId, @OperationTimeframe)";
                 await connection.ExecuteAsync(
                     insertProductionRateSql,
                     new
                     {
                         OperationId = operation,
-                        OperationTimeframe = operation * 10,
-                        Rate = operation * 5,
+                        OperationTimeframe = operation * 60, // хронометраж, секунды
                     }
                 );
             }
